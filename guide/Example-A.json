@@ -1,0 +1,464 @@
+{
+  "format": "dotcom-punch-data",
+  "schemaVersion": "1.0.0",
+  "exportVersion": "1.0.0",
+  "meta": {
+    "format": "dotcom-punch-data",
+    "schemaVersion": "1.0.0",
+    "exportVersion": "1.0.0",
+    "recordingSessionId": "00000000-0000-4000-8000-000000000001",
+    "dataSource": {
+      "kind": "macos-collector",
+      "provenance": "synthetic_example",
+      "provenanceMeaning": "Hand-made example data. Not a real recording.",
+      "provenanceSource": "recorded",
+      "collectorVersion": "dotcom-tracker/0.6.0 (phase06a)",
+      "databaseSchemaVersion": 6
+    },
+    "collectorVersion": "dotcom-tracker/0.6.0 (phase06a)",
+    "startTime": {
+      "utcMs": 1793840400000,
+      "local": "2026-11-05T10:00:00+09:00",
+      "timezone": "Asia/Seoul",
+      "utcOffsetSeconds": 32400
+    },
+    "endTime": {
+      "utcMs": 1793840490000,
+      "local": "2026-11-05T10:01:30+09:00",
+      "timezone": "Asia/Seoul",
+      "utcOffsetSeconds": 32400
+    },
+    "durationMs": 90000,
+    "timezone": "Asia/Seoul",
+    "utcOffsetSeconds": 32400,
+    "requestedDurationSeconds": 90,
+    "actualRecordingDurationSeconds": 85,
+    "observedActiveSeconds": 85,
+    "status": "completed",
+    "endReason": "auto_finish",
+    "selectedServices": [
+      "APP_USAGE",
+      "APP_RANKING",
+      "APP_SWITCHING"
+    ],
+    "selectedScope": {
+      "mode": "APPLICATIONS_ONLY",
+      "applications": [],
+      "websites": [],
+      "excludedApplications": [
+        "com.example.Vault"
+      ],
+      "excludedWebsites": [
+        "bank.example.net"
+      ]
+    },
+    "pauseIntervals": [
+      {
+        "startOffsetMs": 50000,
+        "endOffsetMs": 55000,
+        "seconds": 5,
+        "start": {
+          "utcMs": 1793840450000,
+          "local": "2026-11-05T10:00:50+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        },
+        "end": {
+          "utcMs": 1793840455000,
+          "local": "2026-11-05T10:00:55+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        }
+      }
+    ],
+    "missingIntervals": [
+      {
+        "kind": "interruption",
+        "reason": "paused",
+        "status": "determined",
+        "startOffsetMs": 50000,
+        "endOffsetMs": 55000,
+        "seconds": 5,
+        "start": {
+          "utcMs": 1793840450000,
+          "local": "2026-11-05T10:00:50+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        },
+        "end": {
+          "utcMs": 1793840455000,
+          "local": "2026-11-05T10:00:55+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        }
+      }
+    ],
+    "metricDefinitions": {
+      "app_active_duration": {
+        "label": "App Active Duration",
+        "unit": "seconds",
+        "quantity": "duration",
+        "definition": "Seconds during which the application was the frontmost one while the user was active (no idle, lock, sleep or pause). A stretch still open at the end counts until the recording ended.",
+        "collected": true
+      },
+      "app_activation_count": {
+        "label": "App Activation Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "How many times the application newly became the frontmost one (start of the recording or a switch to it). Coming back after idle, lock or pause does NOT add an activation.",
+        "collected": true
+      },
+      "app_session_count": {
+        "label": "App Session Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of continuous active stretches of the application. Differs from the activation count whenever an idle, lock or pause interrupted a stretch.",
+        "collected": true
+      },
+      "website_active_duration": {
+        "label": "Website Active Duration",
+        "unit": "seconds",
+        "quantity": "duration",
+        "definition": "Seconds during which the site (normalized domain) was the active page of the frontmost browser. A PART of that browser's application time — never add the two.",
+        "collected": false
+      },
+      "website_activation_count": {
+        "label": "Website Activation Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "How many times the site newly became the active one (start, switch of tab or site, browser brought to the front).",
+        "collected": false
+      },
+      "app_transition_count": {
+        "label": "App Transition Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of switches from one application to a different one, as a directed matrix (row = from, column = to).",
+        "collected": true
+      },
+      "website_transition_count": {
+        "label": "Website Transition Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of switches from one site to a different one (also across browsers), as a directed matrix.",
+        "collected": false
+      },
+      "mouse_click_count": {
+        "label": "Mouse Click Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of button presses. macOS clicks (display coordinates) and clicks inside web pages (viewport coordinates) are counted separately and NOT added: a click on a page can appear in both.",
+        "collected": false
+      },
+      "spatial_click_coordinates": {
+        "label": "Spatial Click Coordinates",
+        "unit": "normalized_0_1",
+        "quantity": "position",
+        "definition": "Click positions as x/y between 0 and 1 (origin top-left, y down) on their own display or page viewport, with the original coordinates and the display/viewport size.",
+        "collected": false
+      }
+    },
+    "measurementUnits": {
+      "duration": "seconds (decimal, millisecond resolution). Requested, elapsed and observed-active durations are different measures.",
+      "count": "whole numbers: activations, sessions, transitions and clicks are different counts",
+      "ratio": "share between 0 and 1 (6 decimals)",
+      "timestamp": "UTC epoch milliseconds (…Ms) with the local ISO-8601 time at that moment (…Local)",
+      "timeOffset": "milliseconds since the recording started (…OffsetMs)",
+      "normalizedPosition": "0..1, origin top-left, y grows downward, relative to the display or page viewport the click happened on",
+      "displayCoordinates": "macOS points (Quartz), origin top-left of the display; width/height in points",
+      "pageCoordinates": "CSS pixels inside the page viewport, origin top-left (not screen coordinates); scroll offsets are separate"
+    },
+    "collectedKinds": [
+      "appSegments",
+      "appTransitions",
+      "pauseIntervals",
+      "gaps"
+    ],
+    "notCollectedKinds": [
+      "macClicks",
+      "mouseMoves",
+      "websiteVisits",
+      "websiteTransitions",
+      "websiteClicks",
+      "websiteUncertainIntervals",
+      "displayLayouts"
+    ],
+    "applicationIds": [
+      "com.example.Browser",
+      "com.example.Editor",
+      "com.example.Notes"
+    ],
+    "websiteDomains": [],
+    "privacy": {
+      "options": {
+        "includeSessionName": false,
+        "includeAppNames": true,
+        "pseudonymizeApps": false,
+        "pseudonymizeSites": false,
+        "relativeTimesOnly": false,
+        "keepOriginalDisplayIds": false,
+        "includeEventDetail": true,
+        "coordinateDetail": "none",
+        "includeMovement": false
+      },
+      "contains": {
+        "sessionName": false,
+        "applicationNames": true,
+        "absoluteClockTimes": true,
+        "eventTimes": true,
+        "clickPositions": "none",
+        "movementPath": false,
+        "rawEvents": false
+      },
+      "pseudonymized": {
+        "applications": false,
+        "websites": false,
+        "displays": true
+      },
+      "neverCollected": [
+        "keystrokes",
+        "passwords",
+        "clipboard",
+        "screenshots",
+        "document contents",
+        "full URLs, paths, queries, page titles",
+        "typed text"
+      ]
+    }
+  },
+  "selection": {
+    "metrics": [
+      "app_active_duration",
+      "app_activation_count",
+      "app_session_count",
+      "app_transition_count"
+    ],
+    "contentLevel": "events",
+    "coordinateDetail": "none",
+    "includesMovementPath": false,
+    "durationConversion": "none",
+    "catalogHints": {
+      "version": "2026-11-05",
+      "binding": false
+    }
+  },
+  "metrics": [
+    {
+      "id": "app_active_duration",
+      "label": "App Active Duration",
+      "unit": "seconds",
+      "quantity": "duration",
+      "field": "applicationData.items[].activeDurationSeconds",
+      "collected": true,
+      "definition": "Seconds during which the application was the frontmost one while the user was active (no idle, lock, sleep or pause). A stretch still open at the end counts until the recording ended."
+    },
+    {
+      "id": "app_activation_count",
+      "label": "App Activation Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "applicationData.items[].activationCount",
+      "collected": true,
+      "definition": "How many times the application newly became the frontmost one (start of the recording or a switch to it). Coming back after idle, lock or pause does NOT add an activation."
+    },
+    {
+      "id": "app_session_count",
+      "label": "App Session Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "applicationData.items[].sessionCount",
+      "collected": true,
+      "definition": "Number of continuous active stretches of the application. Differs from the activation count whenever an idle, lock or pause interrupted a stretch."
+    },
+    {
+      "id": "app_transition_count",
+      "label": "App Transition Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "workflowData.apps",
+      "collected": true,
+      "definition": "Number of switches from one application to a different one, as a directed matrix (row = from, column = to)."
+    }
+  ],
+  "applicationData": {
+    "collected": true,
+    "coverage": {
+      "appliesTo": "all_applications",
+      "listed": [],
+      "excluded": [
+        "com.example.Vault"
+      ],
+      "note": "Applications outside this coverage, or excluded, were not measured. They have no row; that does not mean 0 seconds."
+    },
+    "totalActiveSeconds": 85,
+    "units": {
+      "activeDurationSeconds": "seconds",
+      "averageSessionSeconds": "seconds",
+      "shareOfActiveTime": "ratio_0_1",
+      "activationCount": "count",
+      "sessionCount": "count"
+    },
+    "items": [
+      {
+        "id": "com.example.Editor",
+        "name": "Editor",
+        "activeDurationSeconds": 55,
+        "shareOfActiveTime": 0.647059,
+        "activationCount": 58,
+        "sessionCount": 59,
+        "averageSessionSeconds": 0.932,
+        "ranks": {
+          "activeDuration": 1,
+          "activationCount": 1,
+          "sessionCount": 1
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      },
+      {
+        "id": "com.example.Notes",
+        "name": "Notes",
+        "activeDurationSeconds": 20,
+        "shareOfActiveTime": 0.235294,
+        "activationCount": 24,
+        "sessionCount": 24,
+        "averageSessionSeconds": 0.833,
+        "ranks": {
+          "activeDuration": 2,
+          "activationCount": 3,
+          "sessionCount": 3
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      },
+      {
+        "id": "com.example.Browser",
+        "name": "Browser",
+        "activeDurationSeconds": 10,
+        "shareOfActiveTime": 0.117647,
+        "activationCount": 37,
+        "sessionCount": 37,
+        "averageSessionSeconds": 0.27,
+        "ranks": {
+          "activeDuration": 3,
+          "activationCount": 2,
+          "sessionCount": 2
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      }
+    ]
+  },
+  "workflowData": {
+    "apps": {
+      "collected": true,
+      "unit": "count",
+      "transitionCount": 118,
+      "nodes": [
+        "com.example.Editor",
+        "com.example.Browser",
+        "com.example.Notes"
+      ],
+      "counts": [
+        [
+          0,
+          35,
+          22
+        ],
+        [
+          35,
+          0,
+          2
+        ],
+        [
+          22,
+          2,
+          0
+        ]
+      ],
+      "total": 118,
+      "pairs": [
+        {
+          "from": "com.example.Editor",
+          "to": "com.example.Browser",
+          "count": 35
+        },
+        {
+          "from": "com.example.Editor",
+          "to": "com.example.Notes",
+          "count": 22
+        },
+        {
+          "from": "com.example.Browser",
+          "to": "com.example.Editor",
+          "count": 35
+        },
+        {
+          "from": "com.example.Browser",
+          "to": "com.example.Notes",
+          "count": 2
+        },
+        {
+          "from": "com.example.Notes",
+          "to": "com.example.Editor",
+          "count": 22
+        },
+        {
+          "from": "com.example.Notes",
+          "to": "com.example.Browser",
+          "count": 2
+        }
+      ],
+      "names": {
+        "com.example.Editor": "Editor",
+        "com.example.Browser": "Browser",
+        "com.example.Notes": "Notes"
+      }
+    },
+    "matrixOrientation": "counts[i][j] = switches from nodes[i] to nodes[j] (row = from, column = to)",
+    "appActiveIntervals": [
+      {
+        "appId": "com.example.Editor",
+        "name": "Editor",
+        "startOffsetMs": 0,
+        "durationMs": 20000
+      },
+      {
+        "appId": "com.example.Browser",
+        "name": "Browser",
+        "startOffsetMs": 20000,
+        "durationMs": 10000
+      },
+      {
+        "appId": "com.example.Editor",
+        "name": "Editor",
+        "startOffsetMs": 30000,
+        "durationMs": 20000
+      },
+      {
+        "appId": "com.example.Editor",
+        "name": "Editor",
+        "startOffsetMs": 55000,
+        "durationMs": 15000
+      },
+      {
+        "appId": "com.example.Notes",
+        "name": "Notes",
+        "startOffsetMs": 70000,
+        "durationMs": 20000
+      }
+    ]
+  },
+  "conversions": [],
+  "export": {
+    "generatedAt": "2026-11-05T03:00:00.000Z",
+    "generatedAtMs": 1793847600000,
+    "generator": "dotcom-tracker-web/0.6.0",
+    "contentSha256": "0c870533c330c02d309846b8d19e685078ce361b70da6fb317f5de15fbce472e",
+    "hashAlgorithm": "sha256",
+    "canonicalization": "JSON, object keys sorted, no whitespace, over the file without the \"export\" block"
+  }
+}

@@ -1,0 +1,530 @@
+{
+  "format": "dotcom-punch-data",
+  "schemaVersion": "1.0.0",
+  "exportVersion": "1.0.0",
+  "meta": {
+    "format": "dotcom-punch-data",
+    "schemaVersion": "1.0.0",
+    "exportVersion": "1.0.0",
+    "recordingSessionId": "00000000-0000-4000-8000-000000000002",
+    "dataSource": {
+      "kind": "macos-collector",
+      "provenance": "synthetic_example",
+      "provenanceMeaning": "Hand-made example data. Not a real recording.",
+      "provenanceSource": "recorded",
+      "collectorVersion": "dotcom-tracker/0.6.0 (phase06a)",
+      "databaseSchemaVersion": 6
+    },
+    "collectorVersion": "dotcom-tracker/0.6.0 (phase06a)",
+    "startTime": {
+      "utcMs": 1793840400000,
+      "local": "2026-11-05T10:00:00+09:00",
+      "timezone": "Asia/Seoul",
+      "utcOffsetSeconds": 32400
+    },
+    "endTime": {
+      "utcMs": 1793840670000,
+      "local": "2026-11-05T10:04:30+09:00",
+      "timezone": "Asia/Seoul",
+      "utcOffsetSeconds": 32400
+    },
+    "durationMs": 270000,
+    "timezone": "Asia/Seoul",
+    "utcOffsetSeconds": 32400,
+    "requestedDurationSeconds": 270,
+    "actualRecordingDurationSeconds": 255,
+    "observedActiveSeconds": 250,
+    "status": "completed",
+    "endReason": "auto_finish",
+    "selectedServices": [
+      "APP_USAGE",
+      "APP_RANKING",
+      "APP_SWITCHING",
+      "WEBSITE_TRACKING",
+      "MOUSE_TRACKING"
+    ],
+    "selectedScope": {
+      "mode": "ALL_APPS_AND_WEBSITES",
+      "applications": [],
+      "websites": [],
+      "excludedApplications": [],
+      "excludedWebsites": []
+    },
+    "pauseIntervals": [],
+    "missingIntervals": [],
+    "metricDefinitions": {
+      "app_active_duration": {
+        "label": "App Active Duration",
+        "unit": "seconds",
+        "quantity": "duration",
+        "definition": "Seconds during which the application was the frontmost one while the user was active (no idle, lock, sleep or pause). A stretch still open at the end counts until the recording ended.",
+        "collected": true
+      },
+      "app_activation_count": {
+        "label": "App Activation Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "How many times the application newly became the frontmost one (start of the recording or a switch to it). Coming back after idle, lock or pause does NOT add an activation.",
+        "collected": true
+      },
+      "app_session_count": {
+        "label": "App Session Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of continuous active stretches of the application. Differs from the activation count whenever an idle, lock or pause interrupted a stretch.",
+        "collected": true
+      },
+      "website_active_duration": {
+        "label": "Website Active Duration",
+        "unit": "seconds",
+        "quantity": "duration",
+        "definition": "Seconds during which the site (normalized domain) was the active page of the frontmost browser. A PART of that browser's application time — never add the two.",
+        "collected": true
+      },
+      "website_activation_count": {
+        "label": "Website Activation Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "How many times the site newly became the active one (start, switch of tab or site, browser brought to the front).",
+        "collected": true
+      },
+      "app_transition_count": {
+        "label": "App Transition Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of switches from one application to a different one, as a directed matrix (row = from, column = to).",
+        "collected": true
+      },
+      "website_transition_count": {
+        "label": "Website Transition Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of switches from one site to a different one (also across browsers), as a directed matrix.",
+        "collected": true
+      },
+      "mouse_click_count": {
+        "label": "Mouse Click Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of button presses. macOS clicks (display coordinates) and clicks inside web pages (viewport coordinates) are counted separately and NOT added: a click on a page can appear in both.",
+        "collected": true
+      },
+      "spatial_click_coordinates": {
+        "label": "Spatial Click Coordinates",
+        "unit": "normalized_0_1",
+        "quantity": "position",
+        "definition": "Click positions as x/y between 0 and 1 (origin top-left, y down) on their own display or page viewport, with the original coordinates and the display/viewport size.",
+        "collected": true
+      }
+    },
+    "measurementUnits": {
+      "duration": "seconds (decimal, millisecond resolution). Requested, elapsed and observed-active durations are different measures.",
+      "count": "whole numbers: activations, sessions, transitions and clicks are different counts",
+      "ratio": "share between 0 and 1 (6 decimals)",
+      "timestamp": "UTC epoch milliseconds (…Ms) with the local ISO-8601 time at that moment (…Local)",
+      "timeOffset": "milliseconds since the recording started (…OffsetMs)",
+      "normalizedPosition": "0..1, origin top-left, y grows downward, relative to the display or page viewport the click happened on",
+      "displayCoordinates": "macOS points (Quartz), origin top-left of the display; width/height in points",
+      "pageCoordinates": "CSS pixels inside the page viewport, origin top-left (not screen coordinates); scroll offsets are separate"
+    },
+    "collectedKinds": [
+      "appSegments",
+      "appTransitions",
+      "macClicks",
+      "mouseMoves",
+      "websiteVisits",
+      "websiteTransitions",
+      "websiteClicks",
+      "websiteUncertainIntervals",
+      "pauseIntervals",
+      "gaps",
+      "displayLayouts"
+    ],
+    "notCollectedKinds": [],
+    "applicationIds": [
+      "com.example.Browser",
+      "com.example.Editor",
+      "com.figma.Desktop"
+    ],
+    "websiteDomains": [
+      "docs.example.org",
+      "video.example.com"
+    ],
+    "privacy": {
+      "options": {
+        "includeSessionName": false,
+        "includeAppNames": true,
+        "pseudonymizeApps": false,
+        "pseudonymizeSites": false,
+        "relativeTimesOnly": false,
+        "keepOriginalDisplayIds": false,
+        "includeEventDetail": false,
+        "coordinateDetail": "none",
+        "includeMovement": false
+      },
+      "contains": {
+        "sessionName": false,
+        "applicationNames": true,
+        "absoluteClockTimes": true,
+        "eventTimes": false,
+        "clickPositions": "none",
+        "movementPath": false,
+        "rawEvents": false
+      },
+      "pseudonymized": {
+        "applications": false,
+        "websites": false,
+        "displays": true
+      },
+      "neverCollected": [
+        "keystrokes",
+        "passwords",
+        "clipboard",
+        "screenshots",
+        "document contents",
+        "full URLs, paths, queries, page titles",
+        "typed text"
+      ]
+    }
+  },
+  "selection": {
+    "metrics": [
+      "app_active_duration",
+      "app_activation_count",
+      "app_session_count",
+      "website_active_duration",
+      "website_activation_count",
+      "app_transition_count",
+      "website_transition_count",
+      "mouse_click_count"
+    ],
+    "contentLevel": "aggregate",
+    "coordinateDetail": "none",
+    "includesMovementPath": false,
+    "durationConversion": "none",
+    "catalogHints": {
+      "version": "2026-11-05",
+      "binding": false
+    }
+  },
+  "metrics": [
+    {
+      "id": "app_active_duration",
+      "label": "App Active Duration",
+      "unit": "seconds",
+      "quantity": "duration",
+      "field": "applicationData.items[].activeDurationSeconds",
+      "collected": true,
+      "definition": "Seconds during which the application was the frontmost one while the user was active (no idle, lock, sleep or pause). A stretch still open at the end counts until the recording ended."
+    },
+    {
+      "id": "app_activation_count",
+      "label": "App Activation Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "applicationData.items[].activationCount",
+      "collected": true,
+      "definition": "How many times the application newly became the frontmost one (start of the recording or a switch to it). Coming back after idle, lock or pause does NOT add an activation."
+    },
+    {
+      "id": "app_session_count",
+      "label": "App Session Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "applicationData.items[].sessionCount",
+      "collected": true,
+      "definition": "Number of continuous active stretches of the application. Differs from the activation count whenever an idle, lock or pause interrupted a stretch."
+    },
+    {
+      "id": "website_active_duration",
+      "label": "Website Active Duration",
+      "unit": "seconds",
+      "quantity": "duration",
+      "field": "websiteData.items[].activeDurationSeconds",
+      "collected": true,
+      "definition": "Seconds during which the site (normalized domain) was the active page of the frontmost browser. A PART of that browser's application time — never add the two."
+    },
+    {
+      "id": "website_activation_count",
+      "label": "Website Activation Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "websiteData.items[].activationCount",
+      "collected": true,
+      "definition": "How many times the site newly became the active one (start, switch of tab or site, browser brought to the front)."
+    },
+    {
+      "id": "app_transition_count",
+      "label": "App Transition Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "workflowData.apps",
+      "collected": true,
+      "definition": "Number of switches from one application to a different one, as a directed matrix (row = from, column = to)."
+    },
+    {
+      "id": "website_transition_count",
+      "label": "Website Transition Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "workflowData.sites",
+      "collected": true,
+      "definition": "Number of switches from one site to a different one (also across browsers), as a directed matrix."
+    },
+    {
+      "id": "mouse_click_count",
+      "label": "Mouse Click Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "mouseData.clickCount",
+      "collected": true,
+      "definition": "Number of button presses. macOS clicks (display coordinates) and clicks inside web pages (viewport coordinates) are counted separately and NOT added: a click on a page can appear in both."
+    }
+  ],
+  "applicationData": {
+    "collected": true,
+    "coverage": {
+      "appliesTo": "all_applications",
+      "listed": [],
+      "excluded": [],
+      "note": "Applications outside this coverage, or excluded, were not measured. They have no row; that does not mean 0 seconds."
+    },
+    "totalActiveSeconds": 250,
+    "units": {
+      "activeDurationSeconds": "seconds",
+      "averageSessionSeconds": "seconds",
+      "shareOfActiveTime": "ratio_0_1",
+      "activationCount": "count",
+      "sessionCount": "count"
+    },
+    "items": [
+      {
+        "id": "com.figma.Desktop",
+        "name": "Figma",
+        "activeDurationSeconds": 120,
+        "shareOfActiveTime": 0.48,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "averageSessionSeconds": 120,
+        "ranks": {
+          "activeDuration": 1,
+          "activationCount": 3,
+          "sessionCount": 3
+        },
+        "compat": {
+          "punchCatalogId": "figma"
+        }
+      },
+      {
+        "id": "com.example.Browser",
+        "name": "Browser",
+        "activeDurationSeconds": 70,
+        "shareOfActiveTime": 0.28,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "averageSessionSeconds": 70,
+        "ranks": {
+          "activeDuration": 2,
+          "activationCount": 1,
+          "sessionCount": 1
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      },
+      {
+        "id": "com.example.Editor",
+        "name": "Editor",
+        "activeDurationSeconds": 60,
+        "shareOfActiveTime": 0.24,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "averageSessionSeconds": 60,
+        "ranks": {
+          "activeDuration": 3,
+          "activationCount": 2,
+          "sessionCount": 2
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      }
+    ]
+  },
+  "websiteData": {
+    "collected": true,
+    "coverage": {
+      "appliesTo": "all_websites",
+      "listed": [],
+      "excluded": [],
+      "note": "Websites outside this coverage, or excluded, were not measured. They have no row; that does not mean 0 seconds."
+    },
+    "totalActiveSeconds": 10,
+    "units": {
+      "activeDurationSeconds": "seconds",
+      "shareOfWebsiteTime": "ratio_0_1",
+      "activationCount": "count",
+      "sessionCount": "count"
+    },
+    "items": [
+      {
+        "domain": "video.example.com",
+        "activeDurationSeconds": 6,
+        "shareOfWebsiteTime": 0.6,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "ranks": {
+          "activeDuration": 1,
+          "activationCount": 2,
+          "sessionCount": 2
+        },
+        "browsers": [
+          "com.example.Browser"
+        ],
+        "compat": {
+          "punchCatalogId": null
+        }
+      },
+      {
+        "domain": "docs.example.org",
+        "activeDurationSeconds": 4,
+        "shareOfWebsiteTime": 0.4,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "ranks": {
+          "activeDuration": 2,
+          "activationCount": 1,
+          "sessionCount": 1
+        },
+        "browsers": [
+          "com.example.Browser"
+        ],
+        "compat": {
+          "punchCatalogId": null
+        }
+      }
+    ],
+    "note": "Website time is a part of the browser application time; it is never added to application time."
+  },
+  "workflowData": {
+    "apps": {
+      "collected": true,
+      "unit": "count",
+      "transitionCount": 2,
+      "nodes": [
+        "com.example.Editor",
+        "com.example.Browser",
+        "com.figma.Desktop"
+      ],
+      "counts": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "total": 2,
+      "pairs": [
+        {
+          "from": "com.example.Editor",
+          "to": "com.example.Browser",
+          "count": 1
+        },
+        {
+          "from": "com.figma.Desktop",
+          "to": "com.example.Editor",
+          "count": 1
+        }
+      ],
+      "names": {
+        "com.example.Editor": "Editor",
+        "com.example.Browser": "Browser",
+        "com.figma.Desktop": "Figma"
+      }
+    },
+    "sites": {
+      "collected": true,
+      "unit": "count",
+      "transitionCount": 1,
+      "nodes": [
+        "docs.example.org",
+        "video.example.com"
+      ],
+      "counts": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "total": 1,
+      "pairs": [
+        {
+          "from": "docs.example.org",
+          "to": "video.example.com",
+          "count": 1
+        }
+      ]
+    },
+    "matrixOrientation": "counts[i][j] = switches from nodes[i] to nodes[j] (row = from, column = to)"
+  },
+  "mouseData": {
+    "clickCount": {
+      "unit": "count",
+      "display": {
+        "collected": true,
+        "count": 4,
+        "coordinateSystem": "display"
+      },
+      "page": {
+        "collected": true,
+        "count": 3,
+        "coordinateSystem": "page_viewport"
+      },
+      "note": "Not added together: a click inside a web page can be counted in both systems."
+    },
+    "byActiveTarget": {
+      "applications": [
+        {
+          "kind": "app",
+          "id": "com.example.Editor",
+          "clicks": 4
+        }
+      ],
+      "sites": [
+        {
+          "kind": "site",
+          "id": "docs.example.org",
+          "clicks": 2
+        },
+        {
+          "kind": "site",
+          "id": "video.example.com",
+          "clicks": 1
+        }
+      ]
+    }
+  },
+  "conversions": [],
+  "export": {
+    "generatedAt": "2026-11-05T03:00:00.000Z",
+    "generatedAtMs": 1793847600000,
+    "generator": "dotcom-tracker-web/0.6.0",
+    "contentSha256": "b564486afe3f327057b42549eca0b32cddeb4355a0504a86f2ce426f5202b259",
+    "hashAlgorithm": "sha256",
+    "canonicalization": "JSON, object keys sorted, no whitespace, over the file without the \"export\" block"
+  }
+}

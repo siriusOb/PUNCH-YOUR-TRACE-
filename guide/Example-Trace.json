@@ -1,0 +1,1253 @@
+{
+  "format": "dotcom-punch-data",
+  "schemaVersion": "1.0.0",
+  "exportVersion": "1.0.0",
+  "meta": {
+    "format": "dotcom-punch-data",
+    "schemaVersion": "1.0.0",
+    "exportVersion": "1.0.0",
+    "recordingSessionId": "00000000-0000-4000-8000-000000000001",
+    "dataSource": {
+      "kind": "macos-collector",
+      "provenance": "synthetic_example",
+      "provenanceMeaning": "Hand-made example data. Not a real recording.",
+      "provenanceSource": "recorded",
+      "collectorVersion": "dotcom-tracker/0.6.0 (phase06a)",
+      "databaseSchemaVersion": 6
+    },
+    "collectorVersion": "dotcom-tracker/0.6.0 (phase06a)",
+    "startTime": {
+      "utcMs": 1793840400000,
+      "local": "2026-11-05T10:00:00+09:00",
+      "timezone": "Asia/Seoul",
+      "utcOffsetSeconds": 32400
+    },
+    "endTime": {
+      "utcMs": 1793840490000,
+      "local": "2026-11-05T10:01:30+09:00",
+      "timezone": "Asia/Seoul",
+      "utcOffsetSeconds": 32400
+    },
+    "durationMs": 90000,
+    "timezone": "Asia/Seoul",
+    "utcOffsetSeconds": 32400,
+    "requestedDurationSeconds": 90,
+    "actualRecordingDurationSeconds": 85,
+    "observedActiveSeconds": 85,
+    "status": "completed",
+    "endReason": "auto_finish",
+    "selectedServices": [
+      "APP_USAGE",
+      "APP_RANKING",
+      "APP_SWITCHING",
+      "WEBSITE_TRACKING",
+      "MOUSE_TRACKING"
+    ],
+    "selectedScope": {
+      "mode": "ALL_APPS_AND_WEBSITES",
+      "applications": [],
+      "websites": [],
+      "excludedApplications": [
+        "com.example.Vault"
+      ],
+      "excludedWebsites": [
+        "bank.example.net"
+      ]
+    },
+    "pauseIntervals": [
+      {
+        "startOffsetMs": 50000,
+        "endOffsetMs": 55000,
+        "seconds": 5,
+        "start": {
+          "utcMs": 1793840450000,
+          "local": "2026-11-05T10:00:50+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        },
+        "end": {
+          "utcMs": 1793840455000,
+          "local": "2026-11-05T10:00:55+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        }
+      }
+    ],
+    "missingIntervals": [
+      {
+        "kind": "interruption",
+        "reason": "paused",
+        "status": "determined",
+        "startOffsetMs": 50000,
+        "endOffsetMs": 55000,
+        "seconds": 5,
+        "start": {
+          "utcMs": 1793840450000,
+          "local": "2026-11-05T10:00:50+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        },
+        "end": {
+          "utcMs": 1793840455000,
+          "local": "2026-11-05T10:00:55+09:00",
+          "timezone": "Asia/Seoul",
+          "utcOffsetSeconds": 32400
+        }
+      }
+    ],
+    "metricDefinitions": {
+      "app_active_duration": {
+        "label": "App Active Duration",
+        "unit": "seconds",
+        "quantity": "duration",
+        "definition": "Seconds during which the application was the frontmost one while the user was active (no idle, lock, sleep or pause). A stretch still open at the end counts until the recording ended.",
+        "collected": true
+      },
+      "app_activation_count": {
+        "label": "App Activation Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "How many times the application newly became the frontmost one (start of the recording or a switch to it). Coming back after idle, lock or pause does NOT add an activation.",
+        "collected": true
+      },
+      "app_session_count": {
+        "label": "App Session Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of continuous active stretches of the application. Differs from the activation count whenever an idle, lock or pause interrupted a stretch.",
+        "collected": true
+      },
+      "website_active_duration": {
+        "label": "Website Active Duration",
+        "unit": "seconds",
+        "quantity": "duration",
+        "definition": "Seconds during which the site (normalized domain) was the active page of the frontmost browser. A PART of that browser's application time — never add the two.",
+        "collected": true
+      },
+      "website_activation_count": {
+        "label": "Website Activation Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "How many times the site newly became the active one (start, switch of tab or site, browser brought to the front).",
+        "collected": true
+      },
+      "app_transition_count": {
+        "label": "App Transition Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of switches from one application to a different one, as a directed matrix (row = from, column = to).",
+        "collected": true
+      },
+      "website_transition_count": {
+        "label": "Website Transition Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of switches from one site to a different one (also across browsers), as a directed matrix.",
+        "collected": true
+      },
+      "mouse_click_count": {
+        "label": "Mouse Click Count",
+        "unit": "count",
+        "quantity": "count",
+        "definition": "Number of button presses. macOS clicks (display coordinates) and clicks inside web pages (viewport coordinates) are counted separately and NOT added: a click on a page can appear in both.",
+        "collected": true
+      },
+      "spatial_click_coordinates": {
+        "label": "Spatial Click Coordinates",
+        "unit": "normalized_0_1",
+        "quantity": "position",
+        "definition": "Click positions as x/y between 0 and 1 (origin top-left, y down) on their own display or page viewport, with the original coordinates and the display/viewport size.",
+        "collected": true
+      }
+    },
+    "measurementUnits": {
+      "duration": "seconds (decimal, millisecond resolution). Requested, elapsed and observed-active durations are different measures.",
+      "count": "whole numbers: activations, sessions, transitions and clicks are different counts",
+      "ratio": "share between 0 and 1 (6 decimals)",
+      "timestamp": "UTC epoch milliseconds (…Ms) with the local ISO-8601 time at that moment (…Local)",
+      "timeOffset": "milliseconds since the recording started (…OffsetMs)",
+      "normalizedPosition": "0..1, origin top-left, y grows downward, relative to the display or page viewport the click happened on",
+      "displayCoordinates": "macOS points (Quartz), origin top-left of the display; width/height in points",
+      "pageCoordinates": "CSS pixels inside the page viewport, origin top-left (not screen coordinates); scroll offsets are separate"
+    },
+    "collectedKinds": [
+      "appSegments",
+      "appTransitions",
+      "macClicks",
+      "mouseMoves",
+      "websiteVisits",
+      "websiteTransitions",
+      "websiteClicks",
+      "websiteUncertainIntervals",
+      "pauseIntervals",
+      "gaps",
+      "displayLayouts"
+    ],
+    "notCollectedKinds": [],
+    "applicationIds": [
+      "com.example.Browser",
+      "com.example.Editor",
+      "com.example.Notes"
+    ],
+    "websiteDomains": [
+      "docs.example.org",
+      "video.example.com"
+    ],
+    "privacy": {
+      "options": {
+        "includeSessionName": false,
+        "includeAppNames": true,
+        "pseudonymizeApps": false,
+        "pseudonymizeSites": false,
+        "relativeTimesOnly": false,
+        "keepOriginalDisplayIds": false,
+        "includeEventDetail": true,
+        "coordinateDetail": "points",
+        "includeMovement": true
+      },
+      "contains": {
+        "sessionName": false,
+        "applicationNames": true,
+        "absoluteClockTimes": true,
+        "eventTimes": true,
+        "clickPositions": "points",
+        "movementPath": true,
+        "rawEvents": false
+      },
+      "pseudonymized": {
+        "applications": false,
+        "websites": false,
+        "displays": true
+      },
+      "neverCollected": [
+        "keystrokes",
+        "passwords",
+        "clipboard",
+        "screenshots",
+        "document contents",
+        "full URLs, paths, queries, page titles",
+        "typed text"
+      ]
+    }
+  },
+  "selection": {
+    "metrics": [
+      "app_active_duration",
+      "app_activation_count",
+      "app_session_count",
+      "website_active_duration",
+      "website_activation_count",
+      "app_transition_count",
+      "website_transition_count",
+      "mouse_click_count",
+      "spatial_click_coordinates"
+    ],
+    "contentLevel": "events",
+    "coordinateDetail": "points",
+    "includesMovementPath": true,
+    "durationConversion": "seconds_to_minutes",
+    "catalogHints": {
+      "version": "2026-11-05",
+      "binding": false
+    }
+  },
+  "metrics": [
+    {
+      "id": "app_active_duration",
+      "label": "App Active Duration",
+      "unit": "seconds",
+      "quantity": "duration",
+      "field": "applicationData.items[].activeDurationSeconds",
+      "collected": true,
+      "definition": "Seconds during which the application was the frontmost one while the user was active (no idle, lock, sleep or pause). A stretch still open at the end counts until the recording ended."
+    },
+    {
+      "id": "app_activation_count",
+      "label": "App Activation Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "applicationData.items[].activationCount",
+      "collected": true,
+      "definition": "How many times the application newly became the frontmost one (start of the recording or a switch to it). Coming back after idle, lock or pause does NOT add an activation."
+    },
+    {
+      "id": "app_session_count",
+      "label": "App Session Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "applicationData.items[].sessionCount",
+      "collected": true,
+      "definition": "Number of continuous active stretches of the application. Differs from the activation count whenever an idle, lock or pause interrupted a stretch."
+    },
+    {
+      "id": "website_active_duration",
+      "label": "Website Active Duration",
+      "unit": "seconds",
+      "quantity": "duration",
+      "field": "websiteData.items[].activeDurationSeconds",
+      "collected": true,
+      "definition": "Seconds during which the site (normalized domain) was the active page of the frontmost browser. A PART of that browser's application time — never add the two."
+    },
+    {
+      "id": "website_activation_count",
+      "label": "Website Activation Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "websiteData.items[].activationCount",
+      "collected": true,
+      "definition": "How many times the site newly became the active one (start, switch of tab or site, browser brought to the front)."
+    },
+    {
+      "id": "app_transition_count",
+      "label": "App Transition Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "workflowData.apps",
+      "collected": true,
+      "definition": "Number of switches from one application to a different one, as a directed matrix (row = from, column = to)."
+    },
+    {
+      "id": "website_transition_count",
+      "label": "Website Transition Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "workflowData.sites",
+      "collected": true,
+      "definition": "Number of switches from one site to a different one (also across browsers), as a directed matrix."
+    },
+    {
+      "id": "mouse_click_count",
+      "label": "Mouse Click Count",
+      "unit": "count",
+      "quantity": "count",
+      "field": "mouseData.clickCount",
+      "collected": true,
+      "definition": "Number of button presses. macOS clicks (display coordinates) and clicks inside web pages (viewport coordinates) are counted separately and NOT added: a click on a page can appear in both."
+    },
+    {
+      "id": "spatial_click_coordinates",
+      "label": "Spatial Click Coordinates",
+      "unit": "normalized_0_1",
+      "quantity": "position",
+      "field": "mouseData.spatial",
+      "collected": true,
+      "definition": "Click positions as x/y between 0 and 1 (origin top-left, y down) on their own display or page viewport, with the original coordinates and the display/viewport size."
+    }
+  ],
+  "applicationData": {
+    "collected": true,
+    "coverage": {
+      "appliesTo": "all_applications",
+      "listed": [],
+      "excluded": [
+        "com.example.Vault"
+      ],
+      "note": "Applications outside this coverage, or excluded, were not measured. They have no row; that does not mean 0 seconds."
+    },
+    "totalActiveSeconds": 85,
+    "units": {
+      "activeDurationSeconds": "seconds",
+      "averageSessionSeconds": "seconds",
+      "shareOfActiveTime": "ratio_0_1",
+      "activationCount": "count",
+      "sessionCount": "count"
+    },
+    "items": [
+      {
+        "id": "com.example.Editor",
+        "name": "Editor",
+        "activeDurationSeconds": 55,
+        "shareOfActiveTime": 0.647059,
+        "activationCount": 2,
+        "sessionCount": 3,
+        "averageSessionSeconds": 18.333,
+        "ranks": {
+          "activeDuration": 1,
+          "activationCount": 1,
+          "sessionCount": 1
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      },
+      {
+        "id": "com.example.Notes",
+        "name": "Notes",
+        "activeDurationSeconds": 20,
+        "shareOfActiveTime": 0.235294,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "averageSessionSeconds": 20,
+        "ranks": {
+          "activeDuration": 2,
+          "activationCount": 3,
+          "sessionCount": 3
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      },
+      {
+        "id": "com.example.Browser",
+        "name": "Browser",
+        "activeDurationSeconds": 10,
+        "shareOfActiveTime": 0.117647,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "averageSessionSeconds": 10,
+        "ranks": {
+          "activeDuration": 3,
+          "activationCount": 2,
+          "sessionCount": 2
+        },
+        "compat": {
+          "punchCatalogId": null
+        }
+      }
+    ]
+  },
+  "websiteData": {
+    "collected": true,
+    "coverage": {
+      "appliesTo": "all_websites",
+      "listed": [],
+      "excluded": [
+        "bank.example.net"
+      ],
+      "note": "Websites outside this coverage, or excluded, were not measured. They have no row; that does not mean 0 seconds."
+    },
+    "totalActiveSeconds": 10,
+    "units": {
+      "activeDurationSeconds": "seconds",
+      "shareOfWebsiteTime": "ratio_0_1",
+      "activationCount": "count",
+      "sessionCount": "count"
+    },
+    "items": [
+      {
+        "domain": "video.example.com",
+        "activeDurationSeconds": 6,
+        "shareOfWebsiteTime": 0.6,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "ranks": {
+          "activeDuration": 1,
+          "activationCount": 2,
+          "sessionCount": 2
+        },
+        "browsers": [
+          "com.example.Browser"
+        ],
+        "compat": {
+          "punchCatalogId": null
+        }
+      },
+      {
+        "domain": "docs.example.org",
+        "activeDurationSeconds": 4,
+        "shareOfWebsiteTime": 0.4,
+        "activationCount": 1,
+        "sessionCount": 1,
+        "ranks": {
+          "activeDuration": 2,
+          "activationCount": 1,
+          "sessionCount": 1
+        },
+        "browsers": [
+          "com.example.Browser"
+        ],
+        "compat": {
+          "punchCatalogId": null
+        }
+      }
+    ],
+    "note": "Website time is a part of the browser application time; it is never added to application time."
+  },
+  "workflowData": {
+    "apps": {
+      "collected": true,
+      "unit": "count",
+      "transitionCount": 3,
+      "nodes": [
+        "com.example.Editor",
+        "com.example.Browser",
+        "com.example.Notes"
+      ],
+      "counts": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "total": 3,
+      "pairs": [
+        {
+          "from": "com.example.Browser",
+          "to": "com.example.Editor",
+          "count": 1
+        },
+        {
+          "from": "com.example.Editor",
+          "to": "com.example.Browser",
+          "count": 1
+        },
+        {
+          "from": "com.example.Editor",
+          "to": "com.example.Notes",
+          "count": 1
+        }
+      ],
+      "names": {
+        "com.example.Editor": "Editor",
+        "com.example.Browser": "Browser",
+        "com.example.Notes": "Notes"
+      },
+      "sequences": [
+        [
+          "com.example.Editor",
+          "com.example.Browser",
+          "com.example.Editor",
+          "com.example.Notes"
+        ]
+      ],
+      "events": [
+        {
+          "tsMs": 1793840420000,
+          "from": "com.example.Editor",
+          "to": "com.example.Browser",
+          "indirect": false
+        },
+        {
+          "tsMs": 1793840430000,
+          "from": "com.example.Browser",
+          "to": "com.example.Editor",
+          "indirect": false
+        },
+        {
+          "tsMs": 1793840470000,
+          "from": "com.example.Editor",
+          "to": "com.example.Notes",
+          "indirect": false
+        }
+      ]
+    },
+    "sites": {
+      "collected": true,
+      "unit": "count",
+      "transitionCount": 1,
+      "nodes": [
+        "docs.example.org",
+        "video.example.com"
+      ],
+      "counts": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "total": 1,
+      "pairs": [
+        {
+          "from": "docs.example.org",
+          "to": "video.example.com",
+          "count": 1
+        }
+      ],
+      "sequences": [
+        [
+          "docs.example.org",
+          "video.example.com"
+        ]
+      ],
+      "events": [
+        {
+          "tsMs": 1793840424000,
+          "from": "docs.example.org",
+          "to": "video.example.com",
+          "indirect": false
+        }
+      ]
+    },
+    "matrixOrientation": "counts[i][j] = switches from nodes[i] to nodes[j] (row = from, column = to)"
+  },
+  "mouseData": {
+    "clickCount": {
+      "unit": "count",
+      "display": {
+        "collected": true,
+        "count": 30,
+        "coordinateSystem": "display"
+      },
+      "page": {
+        "collected": true,
+        "count": 3,
+        "coordinateSystem": "page_viewport"
+      },
+      "note": "Not added together: a click inside a web page can be counted in both systems."
+    },
+    "byActiveTarget": {
+      "applications": [
+        {
+          "kind": "app",
+          "id": "com.example.Editor",
+          "clicks": 29
+        },
+        {
+          "kind": "system_ui",
+          "id": "(system_ui)",
+          "clicks": 1
+        }
+      ],
+      "sites": [
+        {
+          "kind": "site",
+          "id": "docs.example.org",
+          "clicks": 2
+        },
+        {
+          "kind": "site",
+          "id": "video.example.com",
+          "clicks": 1
+        }
+      ]
+    },
+    "spatial": {
+      "unit": "normalized_0_1",
+      "detail": "points",
+      "display": {
+        "clickCount": 30,
+        "onNoDisplay": 1,
+        "displays": [
+          {
+            "displayId": "display-1",
+            "widthPoints": 1440,
+            "heightPoints": 900,
+            "clickCount": 29,
+            "coordinateSystem": {
+              "name": "display",
+              "origin": "top-left",
+              "unit": "points",
+              "rawFields": [
+                "displayX",
+                "displayY"
+              ]
+            },
+            "points": [
+              {
+                "x": 0.1284722222222222,
+                "y": 0.13,
+                "rawX": 185,
+                "rawY": 117,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840402000
+              },
+              {
+                "x": 0.4215277777777778,
+                "y": 0.2611111111111111,
+                "rawX": 607,
+                "rawY": 235,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840403400
+              },
+              {
+                "x": 0.7270833333333333,
+                "y": 0.6977777777777778,
+                "rawX": 1047,
+                "rawY": 628,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840404800
+              },
+              {
+                "x": 0.6798611111111111,
+                "y": 0.6922222222222222,
+                "rawX": 979,
+                "rawY": 623,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840406200
+              },
+              {
+                "x": 0.6791666666666667,
+                "y": 0.6933333333333334,
+                "rawX": 978,
+                "rawY": 624,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840407600
+              },
+              {
+                "x": 0.2298611111111111,
+                "y": 0.7822222222222223,
+                "rawX": 331,
+                "rawY": 704,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840409000
+              },
+              {
+                "x": 0.81875,
+                "y": 0.27666666666666667,
+                "rawX": 1179,
+                "rawY": 249,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840410400
+              },
+              {
+                "x": 0.6819444444444445,
+                "y": 0.6955555555555556,
+                "rawX": 982,
+                "rawY": 626,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840411800
+              },
+              {
+                "x": 0.6715277777777777,
+                "y": 0.6844444444444444,
+                "rawX": 967,
+                "rawY": 616,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840413200
+              },
+              {
+                "x": 0.40625,
+                "y": 0.2388888888888889,
+                "rawX": 585,
+                "rawY": 215,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840414600
+              },
+              {
+                "x": 0.04791666666666667,
+                "y": 0.43444444444444447,
+                "rawX": 69,
+                "rawY": 391,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840416000
+              },
+              {
+                "x": 0.4097222222222222,
+                "y": 0.23777777777777778,
+                "rawX": 590,
+                "rawY": 214,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840417400
+              },
+              {
+                "x": 0.6902777777777778,
+                "y": 0.7522222222222222,
+                "rawX": 994,
+                "rawY": 677,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840418800
+              },
+              {
+                "x": 0.7916666666666666,
+                "y": 0.8277777777777777,
+                "rawX": 1140,
+                "rawY": 745,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840420200
+              },
+              {
+                "x": 0.2590277777777778,
+                "y": 0.8022222222222222,
+                "rawX": 373,
+                "rawY": 722,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840421600
+              },
+              {
+                "x": 0.7083333333333334,
+                "y": 0.7122222222222222,
+                "rawX": 1020,
+                "rawY": 641,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840423000
+              },
+              {
+                "x": 0.6701388888888888,
+                "y": 0.6833333333333333,
+                "rawX": 965,
+                "rawY": 615,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840424400
+              },
+              {
+                "x": 0.28402777777777777,
+                "y": 0.8066666666666666,
+                "rawX": 409,
+                "rawY": 726,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840425800
+              },
+              {
+                "x": 0.42083333333333334,
+                "y": 0.2611111111111111,
+                "rawX": 606,
+                "rawY": 235,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840427200
+              },
+              {
+                "x": 0.5263888888888889,
+                "y": 0.5844444444444444,
+                "rawX": 758,
+                "rawY": 526,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840428600
+              },
+              {
+                "x": 0.6375,
+                "y": 0.6766666666666666,
+                "rawX": 918,
+                "rawY": 609,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840430000
+              },
+              {
+                "x": 0.6944444444444444,
+                "y": 0.6933333333333334,
+                "rawX": 1000,
+                "rawY": 624,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840431400
+              },
+              {
+                "x": 0.8208333333333333,
+                "y": 0.2788888888888889,
+                "rawX": 1182,
+                "rawY": 251,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840432800
+              },
+              {
+                "x": 0.7020833333333333,
+                "y": 0.7155555555555555,
+                "rawX": 1011,
+                "rawY": 644,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840434200
+              },
+              {
+                "x": 0.6798611111111111,
+                "y": 0.6911111111111111,
+                "rawX": 979,
+                "rawY": 622,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840435600
+              },
+              {
+                "x": 0.3125,
+                "y": 0.11222222222222222,
+                "rawX": 450,
+                "rawY": 101,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840437000
+              },
+              {
+                "x": 0.6701388888888888,
+                "y": 0.6844444444444444,
+                "rawX": 965,
+                "rawY": 616,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840438400
+              },
+              {
+                "x": 0.6375,
+                "y": 0.6777777777777778,
+                "rawX": 918,
+                "rawY": 610,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840439800
+              },
+              {
+                "x": 0.4840277777777778,
+                "y": 0.88,
+                "rawX": 697,
+                "rawY": 792,
+                "button": "left",
+                "target": {
+                  "kind": "app",
+                  "id": "com.example.Editor"
+                },
+                "tsMs": 1793840441200
+              }
+            ]
+          }
+        ]
+      },
+      "page": {
+        "clickCount": 3,
+        "pages": [
+          {
+            "site": "docs.example.org",
+            "browserId": "com.example.Browser",
+            "clickCount": 2,
+            "averageViewport": {
+              "width": 1000,
+              "height": 600
+            },
+            "coordinateSystem": {
+              "name": "page_viewport",
+              "origin": "top-left",
+              "unit": "css_pixels",
+              "rawFields": [
+                "viewportX",
+                "viewportY"
+              ]
+            },
+            "points": [
+              {
+                "x": 0.1,
+                "y": 0.9,
+                "rawX": 100,
+                "rawY": 540,
+                "viewportWidth": 1000,
+                "viewportHeight": 600,
+                "scrollX": 0,
+                "scrollY": 120,
+                "button": "left",
+                "tsMs": 1793840421000
+              },
+              {
+                "x": 0.12,
+                "y": 0.88,
+                "rawX": 120,
+                "rawY": 528,
+                "viewportWidth": 1000,
+                "viewportHeight": 600,
+                "scrollX": 0,
+                "scrollY": 120,
+                "button": "left",
+                "tsMs": 1793840422000
+              }
+            ]
+          },
+          {
+            "site": "video.example.com",
+            "browserId": "com.example.Browser",
+            "clickCount": 1,
+            "averageViewport": {
+              "width": 1000,
+              "height": 600
+            },
+            "coordinateSystem": {
+              "name": "page_viewport",
+              "origin": "top-left",
+              "unit": "css_pixels",
+              "rawFields": [
+                "viewportX",
+                "viewportY"
+              ]
+            },
+            "points": [
+              {
+                "x": 0.5,
+                "y": 0.5,
+                "rawX": 500,
+                "rawY": 300,
+                "viewportWidth": 1000,
+                "viewportHeight": 600,
+                "scrollX": 0,
+                "scrollY": 120,
+                "button": "left",
+                "tsMs": 1793840426000
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "movement": {
+      "sampleCount": 12,
+      "sampleIntervalMs": 100,
+      "strokeCount": 1,
+      "coordinateSystem": {
+        "name": "display",
+        "origin": "top-left",
+        "unit": "normalized_0_1"
+      },
+      "strokes": [
+        {
+          "displayId": "display-1",
+          "distancePoints": 453.542,
+          "points": [
+            {
+              "x": 0.138889,
+              "y": 0.333333,
+              "tsMs": 1793840440000
+            },
+            {
+              "x": 0.166667,
+              "y": 0.344444,
+              "tsMs": 1793840440100
+            },
+            {
+              "x": 0.194444,
+              "y": 0.355556,
+              "tsMs": 1793840440200
+            },
+            {
+              "x": 0.222222,
+              "y": 0.366667,
+              "tsMs": 1793840440300
+            },
+            {
+              "x": 0.25,
+              "y": 0.377778,
+              "tsMs": 1793840440400
+            },
+            {
+              "x": 0.277778,
+              "y": 0.388889,
+              "tsMs": 1793840440500
+            },
+            {
+              "x": 0.305556,
+              "y": 0.4,
+              "tsMs": 1793840440600
+            },
+            {
+              "x": 0.333333,
+              "y": 0.411111,
+              "tsMs": 1793840440700
+            },
+            {
+              "x": 0.361111,
+              "y": 0.422222,
+              "tsMs": 1793840440800
+            },
+            {
+              "x": 0.388889,
+              "y": 0.433333,
+              "tsMs": 1793840440900
+            },
+            {
+              "x": 0.416667,
+              "y": 0.444444,
+              "tsMs": 1793840441000
+            },
+            {
+              "x": 0.444444,
+              "y": 0.455556,
+              "tsMs": 1793840441100
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "conversions": [
+    {
+      "metricId": "app_active_duration",
+      "field": "applicationData.items[].activeDurationSeconds",
+      "rule": {
+        "id": "seconds_to_minutes",
+        "from": "seconds",
+        "to": "minutes",
+        "formula": "value / 60"
+      },
+      "items": [
+        {
+          "id": "com.example.Editor",
+          "original": {
+            "value": 55,
+            "unit": "seconds"
+          },
+          "converted": {
+            "value": 0.916667,
+            "unit": "minutes"
+          }
+        },
+        {
+          "id": "com.example.Notes",
+          "original": {
+            "value": 20,
+            "unit": "seconds"
+          },
+          "converted": {
+            "value": 0.333333,
+            "unit": "minutes"
+          }
+        },
+        {
+          "id": "com.example.Browser",
+          "original": {
+            "value": 10,
+            "unit": "seconds"
+          },
+          "converted": {
+            "value": 0.166667,
+            "unit": "minutes"
+          }
+        }
+      ]
+    },
+    {
+      "metricId": "website_active_duration",
+      "field": "websiteData.items[].activeDurationSeconds",
+      "rule": {
+        "id": "seconds_to_minutes",
+        "from": "seconds",
+        "to": "minutes",
+        "formula": "value / 60"
+      },
+      "items": [
+        {
+          "id": "video.example.com",
+          "original": {
+            "value": 6,
+            "unit": "seconds"
+          },
+          "converted": {
+            "value": 0.1,
+            "unit": "minutes"
+          }
+        },
+        {
+          "id": "docs.example.org",
+          "original": {
+            "value": 4,
+            "unit": "seconds"
+          },
+          "converted": {
+            "value": 0.066667,
+            "unit": "minutes"
+          }
+        }
+      ]
+    }
+  ],
+  "export": {
+    "generatedAt": "2026-11-05T02:00:00.000Z",
+    "generatedAtMs": 1793844000000,
+    "generator": "dotcom-tracker-web/0.6.0",
+    "contentSha256": "036d6f1c37f71f0e03bc9fa702aca319e2f221f399ab3172a06ff588c5a3b084",
+    "hashAlgorithm": "sha256",
+    "canonicalization": "JSON, object keys sorted, no whitespace, over the file without the \"export\" block"
+  }
+}
