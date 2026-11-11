@@ -1,6 +1,6 @@
 const stylesheet = document.createElement('link')
 stylesheet.rel = 'stylesheet'
-stylesheet.href = new URL('tour-punch-content-v28.css', import.meta.url)
+stylesheet.href = new URL('tour.css?view=guide-motion-v60', import.meta.url)
 document.head.append(stylesheet)
 
 const root = document.querySelector('#root')
@@ -86,7 +86,10 @@ let run
 let chapter = 0
 let paused = false
 let activeUnit = 0
-let demoRate = 1
+const guideSpeed = .8 * .95
+const motionEase = 'cubic-bezier(.42,0,.58,1)'
+let demoRate = guideSpeed
+const playbackRate = () => demoRate * (chapter === 2 ? 1.1 : 1)
 let playback
 let navigation = 0
 let completionTimer
@@ -161,7 +164,7 @@ function assertRunning(signal) {
   if (signal.aborted) throw signal.reason
 }
 
-async function hold(ms, signal, rate = demoRate) {
+async function hold(ms, signal, rate = playbackRate()) {
   ms /= rate
   let elapsed = 0
   while (elapsed < ms) {
@@ -173,6 +176,11 @@ async function hold(ms, signal, rate = demoRate) {
   assertRunning(signal)
 }
 
+// Shorten reading/idle time without accelerating cursor, click, scroll, or fades.
+async function dwell(ms, signal, rate = playbackRate()) {
+  await hold(ms * (chapter < 2 ? .84 : 1), signal, rate)
+}
+
 async function find(get, signal) {
   for (let i = 0; i < 80; i++) {
     assertRunning(signal)
@@ -180,10 +188,14 @@ async function find(get, signal) {
     if (element?.isConnected) return element
     await hold(100, signal, 1)
   }
+  console.error('Guide target unavailable:', get.toString())
   throw new Error('A required screen did not open.')
 }
 
 function clickPoint(element, rangeValue = element.value) {
+  // Native hover is disabled, but the virtual pointer still checks occlusion.
+  root.classList.add('tour-virtual-hit-test')
+  try {
   const rect = element.getBoundingClientRect()
   if (element.matches('input[type="range"]')) {
     const fraction = (Number(rangeValue) - Number(element.min)) / (Number(element.max) - Number(element.min))
@@ -198,6 +210,9 @@ function clickPoint(element, rangeValue = element.value) {
     if (element.contains(document.elementFromPoint(x, y))) return [x, y]
   }
   return null
+  } finally {
+    root.classList.remove('tour-virtual-hit-test')
+  }
 }
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), Math.max(min, max))
@@ -257,10 +272,10 @@ async function settle(element, signal, keepCaption, scene, center = false, edge)
     while (elapsed < duration) {
       const now = await new Promise(requestAnimationFrame)
       assertRunning(signal)
-      if (!paused) elapsed += Math.min(40, Math.max(0, now - previous)) * demoRate
+      if (!paused) elapsed += Math.min(40, Math.max(0, now - previous)) * playbackRate()
       previous = now
       const progress = Math.min(1, elapsed / duration)
-      const eased = (1 - Math.cos(Math.PI * progress)) / 2
+      const eased = progress * progress * progress * (10 + progress * (6 * progress - 15))
       scroller.scrollTo({top:start + distance * eased, behavior:'instant'})
     }
     await hold(55, signal)
@@ -282,13 +297,13 @@ function tapFeedback() {
       {transform:'scale(.88)', opacity:.38, offset:.3},
       {transform:'scale(1.6)', opacity:0, offset:1}
     ],
-    {duration:440 / demoRate, easing:'cubic-bezier(.32,0,.24,1)'}
+    {duration:440 / playbackRate(), easing:'cubic-bezier(.32,0,.24,1)'}
   )
 }
 
 function soften(element, duration = 240, opacity = .84) {
   if (element && !motionReduced) {
-    element.animate([{opacity}, {opacity:1}], {duration:duration / demoRate, easing:'cubic-bezier(.22,.61,.36,1)'})
+    element.animate([{opacity}, {opacity:1}], {duration:duration / playbackRate(), easing:'cubic-bezier(.22,.61,.36,1)'})
   }
 }
 
@@ -315,7 +330,7 @@ async function transitionGuideContent(element, signal, update) {
     await commit()
     assertRunning(signal)
     const changed = recordWorkspace ?? personalWorkspace.querySelector('.app-usage-preview') ?? personalWorkspace.querySelector('.app-usage-editor')
-    soften(changed, 190 / demoRate, .9)
+    soften(changed, 190, .9)
     return
   }
   if (document.startViewTransition) {
@@ -332,7 +347,7 @@ async function transitionGuideContent(element, signal, update) {
       document.documentElement.classList.remove('tour-content-transition-active')
     }
   } else {
-    const fade = content.animate([{opacity:1}, {opacity:.7}], {duration:120, easing:'ease-in', fill:'forwards'})
+    const fade = content.animate([{opacity:1}, {opacity:.7}], {duration:120 / playbackRate(), easing:motionEase, fill:'forwards'})
     try {
       await fade.finished
       assertRunning(signal)
@@ -343,6 +358,17 @@ async function transitionGuideContent(element, signal, update) {
     if (!signal.aborted) soften(content, 360, .7)
   }
   assertRunning(signal)
+}
+
+async function pointAtHeading(element, signal) {
+  const section = element.closest('.p26-block, .work-relation-section, .tp-workflow, .tp26-studio, .how-live, .app-usage-preview') ?? element;
+  const heading = section.querySelector('.p26-section-head strong, .trace-transform-head strong, .app-usage-section-head strong, h3, strong');
+  if (!heading) return;
+  const text = document.createRange();
+  text.selectNodeContents(heading);
+  const bounds = text.getBoundingClientRect();
+  if (bounds.bottom < 0 || bounds.top > innerHeight) return;
+  await moveCursor([Math.min(innerWidth - 24, bounds.right + 18), bounds.top + bounds.height / 2], signal);
 }
 
 async function point(element, signal, click = false, fast = false, keepCaption = false, rangeValue, speed = 1, scene, center = false) {
@@ -360,6 +386,7 @@ async function point(element, signal, click = false, fast = false, keepCaption =
   await settle(card ?? field ?? element, signal, keepCaption, scene, center)
   if (!click) {
     element.setAttribute('data-punch-tour-target', 'result')
+    await pointAtHeading(element, signal)
     return
   }
   let destination = clickPoint(element, rangeValue)
@@ -385,14 +412,17 @@ async function moveCursor(destination, signal, fast = false, speed = 1) {
   const [x, y] = destination
   const from = lastCursor ?? [Math.max(8, x - 42), Math.min(innerHeight - 24, y + 30)]
   const distance = Math.hypot(x - from[0], y - from[1])
-  const duration = (fast ? clamp(220 + distance * .34, 285, 430) : clamp(255 + distance * .56, 350, 650)) / speed
+  // Small layout corrections should glide briefly, not replay a full-length move.
+  const duration = (distance < 80
+    ? clamp(130 + distance * 2, 140, 285)
+    : fast ? clamp(220 + distance * .34, 285, 430) : clamp(255 + distance * .56, 350, 650)) / speed
   assertRunning(signal)
   cursor.hidden = false
   if (!motionReduced && distance > 1) {
     const motion = cursor.animate([
       {transform:positionCursor(from)},
       {transform:positionCursor(destination)}
-    ], {duration:duration / demoRate, easing:'cubic-bezier(.42,0,.58,1)', fill:'forwards'})
+    ], {duration:duration / playbackRate(), easing:motionEase, fill:'forwards'})
     pointerMotion = motion
     if (paused) motion.pause()
     const cancel = () => motion.cancel()
@@ -443,7 +473,7 @@ async function act(get, title, body, signal, apply = element => element.click(),
     await frameResult?.(signal)
     if (outcome) await point(await find(outcome, signal), signal, false, false, false, undefined, 1, scene)
     await revealCaption(signal)
-    await hold(readingTime() * chapterPace(), signal)
+    await dwell(readingTime() * chapterPace() * readingScale, signal)
     return
   }
   caption(title, body)
@@ -458,7 +488,7 @@ async function act(get, title, body, signal, apply = element => element.click(),
   const failure = await applied
   if (failure) throw failure
   if (outcome) await point(await find(outcome, signal), signal, false, false, true)
-  await hold((fast ? 700 * captionTimeScale : readingTime()) * chapterPace() * readingScale, signal)
+  await dwell((fast ? 700 * captionTimeScale : readingTime()) * chapterPace() * readingScale, signal)
 }
 
 const importedExamples = new Map()
@@ -522,10 +552,13 @@ async function result(get, title, body, signal, extraTime = 850, brief = false, 
   await transitionCaption(signal)
   caption(title, typeof body === 'function' ? body(element) : body, '적용 결과')
   alignCaption()
-  if (edge) await settle(element, signal, false, scene, false, edge)
+  if (edge) {
+    await settle(element, signal, false, scene, false, edge)
+    await pointAtHeading(element, signal)
+  }
   else await point(element, signal, false, false, false, undefined, 1, scene, !scene)
   await revealCaption(signal)
-  await hold((brief ? 1500 : readingTime() + extraTime * .75 * captionTimeScale) * chapterPace() * readingScale, signal)
+  await dwell((brief ? 1500 : readingTime() + extraTime * .75 * captionTimeScale) * chapterPace() * readingScale, signal)
 }
 
 const manualCount = () => query('[data-testid="p26-digit-card"] input[type="number"]')
@@ -549,24 +582,127 @@ async function showMetricChoices(element, signal) {
   if (!target) throw new Error('시연에 필요한 지표가 없습니다.')
   const rect = element.getBoundingClientRect()
   document.body.append(menu)
-  const limit = panel.getBoundingClientRect().top
+  const bounds = visibleBounds(scrollContainer(element))
   menu.style.width = Math.min(Math.max(rect.width, 190), innerWidth - 24) + 'px'
   menu.style.left = clamp(rect.left, 12, innerWidth - menu.offsetWidth - 12) + 'px'
-  menu.style.top = (rect.bottom + menu.offsetHeight + 6 < limit ? rect.bottom + 4 : Math.max(8, rect.top - menu.offsetHeight - 4)) + 'px'
+  const below = Math.max(0, bounds.bottom - rect.bottom - 4)
+  const above = Math.max(0, rect.top - bounds.top - 4)
+  const opensBelow = menu.offsetHeight <= below || below >= above
+  menu.style.maxHeight = Math.max(1, opensBelow ? below : above) + 'px'
+  menu.style.top = (opensBelow ? rect.bottom + 4 : rect.top - menu.offsetHeight - 4) + 'px'
   try {
+    menu.scrollTop = Math.max(0, target.offsetTop + target.offsetHeight - menu.clientHeight)
     soften(menu, 220, 0)
-    await hold(180, signal)
+    await hold(150, signal)
     const row = target.getBoundingClientRect()
     await moveCursor([row.left + Math.min(35, row.width / 2), row.top + row.height / 2], signal, true)
     target.classList.add('tour-metric-choice-next')
-    await hold(190, signal)
+    await hold(150, signal)
     tapFeedback()
-    await transitionGuideContent(element, signal, () => {
-      choose(element, item => item.value === 'app_activation_count')
-      menu.remove()
+    const close = motionReduced ? null : menu.animate([{opacity:1},{opacity:0}], {
+      duration:180 / playbackRate(), easing:motionEase, fill:'forwards'
     })
+    try {
+      await transitionGuideContent(element, signal, () => {
+        choose(element, item => item.value === 'app_activation_count')
+      })
+      await close?.finished
+      assertRunning(signal)
+    } finally {
+      close?.cancel()
+    }
   } finally {
     menu.remove()
+  }
+}
+
+async function revealGuideSection(container, getSection, signal, update) {
+  if (!container || motionReduced) return update()
+  const before = getSection()?.getBoundingClientRect().height ?? 0
+  let animation
+  const observer = new MutationObserver(() => {
+    const section = getSection()
+    const after = section?.getBoundingClientRect().height ?? 0
+    if (!section || Math.abs(after - before) < 1) return
+    observer.disconnect()
+    animation = section.animate([
+      {height:before + 'px', opacity:before ? .8 : 0, overflow:'clip', boxSizing:'border-box'},
+      {height:after + 'px', opacity:1, overflow:'clip', boxSizing:'border-box'}
+    ], {duration:340 / playbackRate(), easing:motionEase})
+  })
+  observer.observe(container, {childList:true, subtree:true})
+  const cancel = () => animation?.cancel()
+  signal.addEventListener('abort', cancel, {once:true})
+  try {
+    await update()
+    await animation?.finished
+    assertRunning(signal)
+  } finally {
+    observer.disconnect()
+    signal.removeEventListener('abort', cancel)
+    cancel()
+  }
+}
+
+// Keep a selected record anchored; only its selected colour should transition.
+async function selectGuideRecord(record, signal) {
+  const scroller = scrollContainer(record)
+  const anchor = scroller.style.overflowAnchor
+  const top = scroller.scrollTop
+  scroller.style.overflowAnchor = 'none'
+  try {
+    assertRunning(signal)
+    record.click()
+    await new Promise(requestAnimationFrame)
+    await new Promise(requestAnimationFrame)
+    assertRunning(signal)
+    scroller.scrollTop = top
+  } finally {
+    scroller.style.overflowAnchor = anchor
+  }
+}
+
+async function simulatePickerClick(file, signal) {
+  await point(file, signal, true, false, true)
+  await hold(120, signal)
+  assertRunning(signal)
+  tapFeedback()
+  file.dataset.punchTourClick = 'true'
+  if (!motionReduced) file.animate([
+    {backgroundColor:'#fff',color:'#111'},
+    {backgroundColor:'#eef0f3',color:'#001ef7',offset:.35},
+    {backgroundColor:'#fff',color:'#111'}
+  ], {duration:440 / playbackRate(),easing:motionEase})
+  try { await hold(420, signal) }
+  finally { delete file.dataset.punchTourClick }
+}
+
+let personalSessionActive = false
+function beginPersonalSession() {
+  if (personalSessionActive) return false
+  document.dispatchEvent(new Event('punch-guide-records-start'))
+  query('.browser-shell')?.dispatchEvent(new Event('punch-guide-personal-start'))
+  personalSessionActive = true
+  examplesReady = false
+  return true
+}
+function restorePersonalSession() {
+  if (!personalSessionActive) return
+  restoreTraceSession?.()
+  document.dispatchEvent(new Event('punch-guide-records-end'))
+  query('.browser-shell')?.dispatchEvent(new Event('punch-guide-personal-end'))
+  personalSessionActive = false
+  restoreGuideManual = undefined
+}
+
+let restoreTraceSession
+function ensureTraceSession() {
+  if (restoreTraceSession) return
+  const workspace = query('.browser-shell')
+  workspace.dispatchEvent(new Event('punch-guide-trace-start'))
+  restoreTraceSession = () => {
+    workspace.dispatchEvent(new Event('punch-guide-trace-end'))
+    restoreTraceSession = undefined
   }
 }
 
@@ -574,26 +710,33 @@ async function chooseDemoFile({mode, scope, ids, recordId, copy, scene, resetRec
   await transitionCaption(signal)
   const modeButton = await find(() => query(mode), signal)
   const modeSelected = modeButton.getAttribute('aria-pressed') === 'true' || modeButton.classList.contains('is-selected')
-  if (!modeSelected) {
-    await point(modeButton, signal, true, true)
-    tapFeedback()
-  }
+  await point(modeButton, signal, true, false)
+  await hold(120, signal)
+  assertRunning(signal)
+  tapFeedback()
   if (!modeSelected || resetRecord) {
-    await transitionGuideContent(modeButton, signal, () => {
-      if (resetRecord) modeButton.dataset.punchTourResetRecord = 'true'
-      try {
-        beforeModeChange?.()
-        modeButton.click()
-      } finally {
-        delete modeButton.dataset.punchTourResetRecord
-      }
-    })
+    const workspace = modeButton.closest('.page-content')
+    await revealGuideSection(workspace, () => query(scope)?.querySelector('.tk-list'), signal,
+      () => transitionGuideContent(modeButton, signal, () => {
+        if (resetRecord) modeButton.dataset.punchTourResetRecord = 'true'
+        try {
+          beforeModeChange?.()
+          modeButton.click()
+        } finally {
+          delete modeButton.dataset.punchTourResetRecord
+        }
+      }))
   }
 
   const file = await find(() => picker(scope), signal)
   await point(file, signal, true, true, false, undefined, 1.25, scene)
   caption('CHOOSE FILE', copy)
-  await Promise.all([revealCaption(signal, tapFeedback), importExample(scope, ids, signal)])
+  const workspace = query(scope)
+  await Promise.all([
+    revealCaption(signal, tapFeedback),
+    revealGuideSection(workspace, () => workspace?.querySelector('.tk-list'), signal,
+      () => importExample(scope, ids, signal))
+  ])
   const record = await find(() => exampleRecord(recordId, query(scope)), signal)
   const previousRate = demoRate
   demoRate *= recordSpeed
@@ -604,7 +747,7 @@ async function chooseDemoFile({mode, scope, ids, recordId, copy, scene, resetRec
       await moveCursor(target, signal, true, 1.25)
     }
     tapFeedback()
-    await transitionGuideContent(record, signal, () => record.click())
+    await selectGuideRecord(record, signal)
     if (recordId === 'A') examplesReady = true
     await hold(200, signal)
   } finally {
@@ -612,7 +755,9 @@ async function chooseDemoFile({mode, scope, ids, recordId, copy, scene, resetRec
   }
 }
 
-async function personalDemo(signal) {
+let restoreGuideManual
+
+async function manualInputDemo(signal) {
   if (!query('[data-testid="usage-mode-manual"]')) tab(titles[0])?.click()
   await act(() => query('[data-testid="usage-mode-manual"]'), 'MANUAL INPUT',
     'MANUAL INPUT에서는 기록 파일 없이 앱별 실행 횟수를 직접 조정할 수 있습니다.', signal,
@@ -628,6 +773,8 @@ async function personalDemo(signal) {
     if (demoOption && demoOption.isConnected) demoOption.click()
     else if (count.isConnected) setInput(count, originalValue)
   }
+  signal.addEventListener('abort', restoreManual, {once:true})
+  restoreGuideManual = restoreManual
   try {
     setInput(count, 42)
     await find(() => manualGraphic(count, '42'), signal)
@@ -637,20 +784,31 @@ async function personalDemo(signal) {
         setInput(element, 58)
         soften(await find(() => manualGraphic(count, '58'), runSignal), 260, .82)
       }, false, () => count.closest('article'), undefined, false, undefined, undefined, .6)
-    await chooseDemoFile({
-      mode: '[data-testid="usage-mode-tracker"]', scope: personal, ids: 'AB', recordId: 'A',
-      copy: '파일 선택에서 Tracker가 내보낸 PUNCH DATA를 불러오고, 목록에서 사용할 기록을 고릅니다.',
-      scene: importScene, resetRecord: true, beforeModeChange: restoreManual
-    }, signal)
-  } finally {
+  } catch (error) {
     restoreManual()
+    throw error
   }
+}
+
+async function personalImportDemo(signal) {
+  await chooseDemoFile({
+    mode: '[data-testid="usage-mode-tracker"]', scope: personal, ids: 'AB', recordId: 'A',
+    copy: '파일 선택에서 Tracker가 내보낸 PUNCH DATA를 불러오고, 목록에서 사용할 기록을 고릅니다.',
+    scene: importScene, resetRecord: true, beforeModeChange: () => restoreGuideManual?.()
+  }, signal)
+  // Let the selected record settle before introducing its metric controls.
+  await hold(420, signal)
+}
+
+async function visualizeDemo(signal) {
+  if (!query('[data-testid="tracker-metric"]')) await preparePersonal(signal)
   await act(() => query('[data-testid="tracker-metric"]'), 'WHAT TO COUNT',
     '그래픽으로 표현할 데이터를 선택합니다.', signal,
     showMetricChoices, true, undefined, undefined, false, undefined,
     () => [exampleRecord('A', query(personal)), query('[data-testid="tracker-metric"]')], 1, false)
   await result(() => query('.app-usage-preview .app-usage-section-head'), 'APP SWITCH-INS',
     '선택한 지표로 카드의 숫자가 다시 계산되고, 펀치 그래픽도 그 숫자에 맞춰 바뀝니다.', signal, 100, false, () => [query('.app-usage-preview [data-testid="p26-digit-card"]')], undefined, .7)
+  await hold(420, signal)
 }
 
 const howSource = '[data-testid="how-source"]'
@@ -723,18 +881,21 @@ async function drawLiveTrace(signal) {
     query('.trace-status > span:nth-child(3) b')?.textContent === '1' ? surface : null, signal)
 }
 
-async function interactionDemo(signal) {
-  const workspace = await find(() => query('.browser-shell'), signal)
-  workspace.dispatchEvent(new Event('punch-guide-trace-start'))
-  const restore = () => {
-    if (traceExport()?.getAttribute('aria-expanded') === 'true') traceExport().click()
-    workspace.dispatchEvent(new Event('punch-guide-trace-end'))
-  }
+async function interactionLiveDemo(signal) {
+  ensureTraceSession()
+  const restore = () => {}
   try {
     const live = await find(() => query('[data-testid="how-mode-live"]'), signal)
     await transitionCaption(signal)
-    live.click()
-    await point(await find(traceToggle, signal), signal, true, true)
+    await settle(await find(() => query('.interaction-section-head'), signal), signal, false,
+      () => [query('.interaction-section-head'), query('#punch-tour-live'), query('.how-live-head')], false, 'top')
+    if (!live.classList.contains('is-selected')) {
+      await point(live, signal, true, false)
+      tapFeedback()
+      live.click()
+      await new Promise(requestAnimationFrame)
+    }
+    await point(await find(traceToggle, signal), signal, true, false)
     caption('LIVE INPUT', 'TRACE ON을 켜면 지금 화면에서 남기는 클릭과 드래그가 실시간 그래픽으로 바뀝니다.')
     alignCaption()
     await revealCaption(signal, () => {
@@ -742,11 +903,10 @@ async function interactionDemo(signal) {
       if (traceToggle().getAttribute('aria-pressed') !== 'true') traceToggle().click()
     })
     await drawLiveTrace(signal)
-    await hold(550 * .75, signal)
+    await dwell(550 * .75, signal)
 
     await act(traceExport, 'EXPORT TRACE', '하단 EXPORT에서 방금 만든 흔적을 그래픽으로 내보낼 수 있습니다.',
-      signal, element => element.click(), false, undefined, undefined, true)
-    if (traceExport().getAttribute('aria-expanded') === 'true') traceExport().click()
+      signal, () => {}, false, undefined, undefined, true, undefined, undefined, .6)
 
     const clear = await find(traceClear, signal)
     await transitionCaption(signal)
@@ -755,6 +915,18 @@ async function interactionDemo(signal) {
     clear.click()
     await find(() => query('.how-contour .trace-contour-empty'), signal)
 
+    await hold(420, signal)
+    return restore
+  } catch (error) {
+    restore()
+    throw error
+  }
+}
+
+async function interactionImportDemo(signal) {
+  ensureTraceSession()
+  const restore = () => {}
+  try {
     await chooseDemoFile({
       mode: '[data-testid="how-mode-tracker"]', scope: howSource, ids: ['Trace'], recordId: 'Trace', recordSpeed: 1.25,
       copy: '파일 선택에서 개별 클릭 좌표가 담긴 PUNCH DATA를 불러옵니다.'
@@ -767,9 +939,10 @@ async function interactionDemo(signal) {
     await transitionCaption(signal)
     await point(await find(contourExport, signal), signal, true, true, false, undefined, 1,
       () => [query('.how-contour')])
+    tapFeedback()
     caption('EXPORT CONTOUR', '클릭 위치와 밀도로 만든 윤곽 그래픽은 EXPORT CONTOUR에서 이미지로 내보낼 수 있습니다.')
     await revealCaption(signal)
-    await hold(readingTime() * chapterPace(), signal)
+    await dwell(readingTime() * chapterPace(), signal)
     await transitionCaption(signal)
     return restore
   } catch (error) {
@@ -800,7 +973,7 @@ async function clickChapter(index, signal, finishPrevious) {
     if (!signal.aborted) root.classList.remove('tour-chapter-changing')
   }
   soften(query('.page-content'), 290, .72)
-  if (index !== 1) await hold(700, signal)
+  if (index !== 1) await dwell(700, signal)
 }
 
 const sharedRecord = id => {
@@ -811,6 +984,13 @@ const sharedRecordScene = () => [picker(shared), sharedRecord('A'), sharedRecord
 const sharedCardsScene = () => [participantApps(0), participantApps(1)]
 
 async function appCardsDemo(signal) {
+  await transitionCaption(signal)
+  caption('COMPARE RECORDS', '파일 선택 아래 목록에서 기록을 고르면 선택한 순서대로 참가자 카드에 적용됩니다.')
+  alignCaption()
+  const file = await find(() => picker(shared), signal)
+  await point(file, signal, true, false, false)
+  await revealCaption(signal)
+  await simulatePickerClick(file, signal)
   const previousRate = demoRate
   demoRate *= 1.25
   try {
@@ -825,10 +1005,10 @@ async function appCardsDemo(signal) {
   } finally {
     demoRate = previousRate
   }
-  await hold(500, signal, 1)
+  await dwell(500, signal, guideSpeed)
   const apps = await find(() => participantApps(0), signal)
   await settle(apps, signal, true, sharedCardsScene, true)
-  await hold(readingTime() * chapterPace(), signal)
+  await dwell(readingTime() * chapterPace(), signal)
 }
 
 async function prepareComparison(signal) {
@@ -863,9 +1043,10 @@ async function teamDemo(signal) {
   await settle(button.closest('.our-export-bottom'), signal, false, undefined, false, 'bottom')
   await Promise.all([
     revealCaption(signal),
-    point(button, signal, true, true, true)
+    point(button, signal, true, false, true, undefined, .75)
   ])
-  await hold(readingTime() * chapterPace(), signal)
+  tapFeedback()
+  await dwell(readingTime() * chapterPace(), signal)
 }
 
 async function settlePrintArtwork(signal) {
@@ -914,7 +1095,7 @@ async function glideRange(element, target, signal) {
     while (elapsed < duration) {
       const now = await new Promise(requestAnimationFrame)
       assertRunning(signal)
-      if (!paused) elapsed += Math.min(34, Math.max(0, now - previous)) * demoRate
+      if (!paused) elapsed += Math.min(34, Math.max(0, now - previous)) * playbackRate()
       previous = now
       const progress = Math.min(1, elapsed / duration)
       const eased = progress * progress * progress * (10 + progress * (6 * progress - 15))
@@ -956,7 +1137,7 @@ async function printDemo(signal) {
   tapFeedback()
   characteristic.click()
   await settlePrintArtwork(signal)
-  await hold(readingTime(), signal)
+  await dwell(readingTime(), signal)
 }
 
 async function selectPrintOption(get, signal) {
@@ -976,12 +1157,12 @@ async function compositionDemo(signal) {
   await point(row, signal, true, true)
   caption('COMPOSITION', 'GRID에서 ROW로 바꾸면 앱 그래픽이 한 줄로 나란히 배치됩니다.')
   await revealCaption(signal)
-  await hold(600, signal)
+  await hold(360, signal)
   tapFeedback()
   row.click()
   await find(() => canvas()?.classList.contains('tp26-artboard--row') ? canvas() : null, signal)
   await settlePrintArtwork(signal)
-  await hold(readingTime(), signal)
+  await dwell(readingTime(), signal)
 }
 
 async function framePrintResult(signal) {
@@ -994,34 +1175,14 @@ async function adjustmentDemo(signal) {
   await selectPrintOption(() => layout('ROW'), signal)
   setInput(await find(() => range('PATTERN REPEAT'), signal), 2)
   await new Promise(requestAnimationFrame)
-  const scale = await find(() => range('SCALE'), signal)
-  const initialScale = parseFloat(scale.getAttribute('aria-valuetext'))
-  const targetScalePosition = Math.max(0, Math.min(65, Math.floor(Number(scale.value) * .65)))
   await transitionCaption(signal)
-  const copy = 'SCALE을 낮춰 그래픽 크기를 줄이고, PATTERN REPEAT로 패턴을 반복합니다.'
-  caption('ADJUST', copy, '적용 결과')
-  alignCaption()
-  await framePrintResult(signal)
-  await act(() => range('SCALE'), 'ADJUST', copy, signal, async (scale, runSignal) => {
-    await glideRange(scale, targetScalePosition, runSignal)
-    await settlePrintArtwork(runSignal)
-    await find(() => parseFloat(scale.getAttribute('aria-valuetext')) <= initialScale ? canvas() : null, runSignal)
-    await hold(1000, runSignal)
-    const repeat = await find(() => range('PATTERN REPEAT'), runSignal)
-    const sixRepeats = 4
-    await point(repeat, runSignal, true, true, false, sixRepeats)
-    const before = canvas()?.querySelectorAll('image').length ?? 0
-    const wasThree = repeat.closest('label')?.querySelector('b')?.textContent === '3×'
-    tapFeedback()
+  const copy = 'PATTERN REPEAT로 반복 횟수를 바꾸고, 조절 바에서 그래픽의 비율과 간격을 다듬을 수 있습니다.'
+  const sixRepeats = 4
+  await act(() => range('PATTERN REPEAT'), 'ADJUST', copy, signal, async (repeat, runSignal) => {
     await glideRange(repeat, sixRepeats, runSignal)
     await settlePrintArtwork(runSignal)
-    await find(() => {
-      const rendered = canvas()
-      const label = rendered?.getAttribute('aria-label')
-      const count = rendered?.querySelectorAll('image').length ?? 0
-      return label?.includes('6회') && (!wasThree || count > before) ? rendered : null
-    }, runSignal)
-  }, false, undefined, undefined, true, targetScalePosition, undefined, 1, false, framePrintResult)
+    await find(() => canvas()?.getAttribute('aria-label')?.includes('6회') ? canvas() : null, runSignal)
+  }, false, undefined, undefined, true, sixRepeats, undefined, .85, false)
 }
 
 async function selectWorkflowExample(signal) {
@@ -1050,14 +1211,19 @@ async function finishDemo(signal) {
   if (!clickPoint(save)) await settle(save, signal, false)
   const destination = clickPoint(save)
   if (!destination) throw new Error('저장 버튼이 화면에 보이지 않습니다.')
-  await Promise.all([revealCaption(signal), moveCursor(destination, signal, true)])
-  await hold(readingTime(), signal)
-  showReplay(save.getBoundingClientRect(), false)
+  await Promise.all([revealCaption(signal), moveCursor(destination, signal, false, .8 / 1.1)])
+  // Final pointer arrival is followed by an exact, unscaled half-second beat.
+  await hold(500, signal, 1)
+  assertRunning(signal)
+  await showReplay(save.getBoundingClientRect(), false)
 }
 
 const units = [
-  {chapter:0, demo:personalDemo},
-  {chapter:0, demo:interactionDemo},
+  {chapter:0, demo:manualInputDemo},
+  {chapter:0, demo:personalImportDemo},
+  {chapter:0, demo:visualizeDemo},
+  {chapter:0, demo:interactionLiveDemo},
+  {chapter:0, demo:interactionImportDemo},
   {chapter:1, demo:appCardsDemo},
   {chapter:1, demo:ourTraceDemo},
   {chapter:1, demo:overlapDemo},
@@ -1075,7 +1241,7 @@ async function preparePersonal(signal) {
   await find(() => picker(personal), signal)
   await importExample(personal, 'AB', signal)
   const record = await find(() => exampleRecord('A', query(personal)), signal)
-  record.click()
+  if (record.getAttribute('aria-pressed') !== 'true') record.click()
   examplesReady = true
 }
 
@@ -1124,9 +1290,10 @@ document.addEventListener('pointermove', event => {
 }, {passive:true})
 
 function setDemoRate(rate) {
-  demoRate = rate
-  panel.style.setProperty('--tour-caption-enter', 360 / rate + 'ms')
-  panel.style.setProperty('--tour-caption-exit', 220 / rate + 'ms')
+  demoRate = rate * guideSpeed
+  panel.style.setProperty('--tour-caption-enter', 360 / playbackRate() + 'ms')
+  panel.style.setProperty('--tour-caption-exit', 220 / playbackRate() + 'ms')
+  document.documentElement.style.setProperty('--tour-content-fade', 360 / playbackRate() + 'ms')
 }
 
 async function play(from, singleChapter) {
@@ -1150,6 +1317,7 @@ async function play(from, singleChapter) {
   launch.hidden = true
   let finishUnit
   let finishShared
+  let completed = false
   const selectedChapter = units[from]?.chapter
   try {
     for (let index = from; index < units.length; index++) {
@@ -1165,6 +1333,9 @@ async function play(from, singleChapter) {
       const content = chapter === 0 ? query('[data-testid="usage-mode-manual"]')
         : chapter === 1 ? query('.our-trace-workspace') : query('.tp26-family-nav')
       const finishPrevious = () => {
+        // Restore the outgoing trace after the new chapter has mounted, never
+        // while its record list is still visible and can shrink the scroll area.
+        if (unit.demo !== interactionLiveDemo && unit.demo !== interactionImportDemo) restoreTraceSession?.()
         finishUnit?.()
         finishUnit = undefined
         if (chapter !== 1) {
@@ -1178,18 +1349,13 @@ async function play(from, singleChapter) {
         finishPrevious()
         if (!content) tab(titles[0])?.click()
       }
-      if (unit.demo === appCardsDemo) {
-        caption('COMPARE RECORDS', '파일 선택 아래 목록에서 기록을 고르면 선택한 순서대로 참가자 카드에 적용됩니다.')
-        alignCaption()
-        void revealCaption(signal).catch(() => {})
-      }
       if (chapter === 1 && !finishShared) {
         if (!sharedRecord('A') || !sharedRecord('B')) {
           await find(() => picker(shared), signal)
           await importExample(shared, 'AB', signal)
           await find(() => sharedRecord('A') && sharedRecord('B'), signal)
         }
-        examplesReady = true
+        // Shared imports do not imply a personal record is selected for TEST PRINT.
         const workspace = await find(() => query('.browser-shell'), signal)
         workspace.dispatchEvent(new Event('punch-guide-comparison-start'))
         finishShared = () => workspace.dispatchEvent(new Event('punch-guide-comparison-end'))
@@ -1210,10 +1376,11 @@ async function play(from, singleChapter) {
         finishUnit = undefined
       }
       await finishDemo(signal)
+      assertRunning(signal)
+      completed = true
     }
     setGuideCursor(false)
     panel.dataset.phase = '시연 완료'
-    if (activeUnit === units.length) scheduleCompletionClose()
   } catch (error) {
     if (signal.aborted) return
     clearHighlight()
@@ -1221,12 +1388,60 @@ async function play(from, singleChapter) {
     caption('시연을 이어갈 수 없습니다', error.message, '다시 재생 가능')
     panel.classList.remove('tour-caption-out')
   } finally {
-    finishUnit?.()
-    finishShared?.()
+    if (!signal.aborted) {
+      await transitionGuideSession(() => {
+        finishUnit?.()
+        finishShared?.()
+        if (completed) {
+          panel.hidden = exitGuide.hidden = true
+          document.body.classList.remove('tour-dock-active')
+        }
+        restorePersonalSession()
+      }, completed)
+    } else {
+      finishUnit?.()
+      finishShared?.()
+    }
     if (!signal.aborted) {
       pauseButton.disabled = true
     }
   }
+}
+
+let sessionFade = Promise.resolve()
+function transitionGuideSession(update, fadePanel = false) {
+  const task = sessionFade.catch(() => {}).then(async () => {
+    const originalOpacity = root.style.opacity
+    let animation
+    let panelFade
+    document.body.classList.add('tour-session-changing')
+    try {
+      if (!motionReduced) {
+        animation = root.animate([{opacity:1},{opacity:0}], {duration:180,easing:motionEase,fill:'forwards'})
+        if (fadePanel) panelFade = panel.animate([{opacity:1},{opacity:0}], {duration:180,easing:motionEase,fill:'forwards'})
+        await animation.finished
+      }
+      await update()
+      // React state, the restored tab, and its scroll position settle while hidden.
+      await new Promise(requestAnimationFrame)
+      await new Promise(requestAnimationFrame)
+      await new Promise(requestAnimationFrame)
+      placeReplay()
+      animation?.cancel()
+      root.style.opacity = '0'
+      if (!motionReduced) {
+        animation = root.animate([{opacity:0},{opacity:1}], {duration:280,easing:motionEase,fill:'forwards'})
+        await animation.finished
+      }
+    } finally {
+      root.style.opacity = originalOpacity
+      animation?.cancel()
+      panelFade?.cancel()
+      document.body.classList.remove('tour-session-changing')
+    }
+  })
+  sessionFade = task
+  return task
 }
 
 async function start(index, singleChapter = false) {
@@ -1239,6 +1454,16 @@ async function start(index, singleChapter = false) {
   pointerMotion?.cancel()
   await playback
   if (request !== navigation) return
+  await sessionFade
+  if (request !== navigation) return
+  if (!personalSessionActive) {
+    await transitionGuideSession(() => {
+      beginPersonalSession()
+      const content = query('.page-content')
+      if (content) scrollContainer(content).scrollTo({top:0,behavior:'instant'})
+    })
+    if (request !== navigation) return
+  }
   nextButton.disabled = false
   pauseButton.disabled = false
   playback = play(index, singleChapter)
@@ -1248,7 +1473,8 @@ async function close(origin) {
   if (panel.hidden || panel.inert) return
   cancelCompletionClose()
   const request = ++navigation
-  run?.abort()
+  paused = true
+  pointerMotion?.pause()
   root.classList.remove('tour-chapter-changing')
   panel.classList.remove('tour-scrolling', 'tour-result-scrolling', 'tour-user-scrolling', 'tour-caption-in')
   clearHighlight()
@@ -1271,6 +1497,15 @@ async function close(origin) {
     animation.cancel()
   } else {
     panel.hidden = exitGuide.hidden = true
+  }
+  if (personalSessionActive) {
+    await transitionGuideSession(async () => {
+      run?.abort()
+      await playback
+      restorePersonalSession()
+    })
+  } else {
+    await playback
   }
   document.body.classList.remove('tour-dock-active')
   showReplay(origin)
@@ -1378,7 +1613,7 @@ function showReplay(origin, restoreFocus = true) {
   placeReplay()
   if (!origin?.width || motionReduced) {
     if (restoreFocus) reopen.focus()
-    return
+    return Promise.resolve()
   }
 
   clearReplayFlight()
@@ -1406,7 +1641,7 @@ function showReplay(origin, restoreFocus = true) {
     {opacity:1, transform:atOrigin, offset:.2, easing:'cubic-bezier(.32,0,.24,1)'},
     {opacity:1, transform:'none'}
   ], {duration:720, fill:'both'})
-  void animation.finished.then(() => {
+  return animation.finished.then(() => {
     if (replayFlight !== flight) return
     clearReplayFlight()
     if (restoreFocus) reopen.focus()

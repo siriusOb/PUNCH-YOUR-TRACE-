@@ -1,7 +1,7 @@
 const INTRO_PLAYBACK_RATE = 1.44;
 
-// The intro GIF contains independent, opaque, full-canvas frames. Decode each
-// frame with the browser so playback can report when the last one was painted.
+// The intro GIF starts with a full frame and stores later changes as opaque patches.
+// Decode each patch separately and composite it onto the persistent canvas.
 function readFrames(bytes) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const word = offset => view.getUint16(offset, true);
@@ -41,15 +41,31 @@ function readFrames(bytes) {
       skipBlocks();
       continue;
     }
-    if (marker !== 0x2c || word(offset) || word(offset + 2) ||
-        word(offset + 4) !== width || word(offset + 6) !== height) {
-      throw new Error('Intro GIF frames must cover the full canvas');
+    if (marker !== 0x2c || offset + 9 > bytes.length) {
+      throw new Error('Invalid intro GIF frame');
     }
-    offset += 10 + paletteLength(bytes[offset + 8]);
+    const left = word(offset);
+    const top = word(offset + 2);
+    const patchWidth = word(offset + 4);
+    const patchHeight = word(offset + 6);
+    if (!patchWidth || !patchHeight || left + patchWidth > width || top + patchHeight > height ||
+        (!frames.length && (left || top || patchWidth !== width || patchHeight !== height))) {
+      throw new Error('Invalid intro GIF patch bounds');
+    }
+    const frameHeader = header.slice();
+    const frameScreen = new DataView(frameHeader.buffer);
+    frameScreen.setUint16(6, patchWidth, true);
+    frameScreen.setUint16(8, patchHeight, true);
+    const descriptor = bytes.slice(start, offset + 9);
+    descriptor.fill(0, 1, 5);
+    const dataStart = offset + 9;
+    offset = dataStart + paletteLength(bytes[offset + 8]) + 1;
     skipBlocks();
     frames.push({
       duration,
-      image: new Blob([header, bytes.subarray(start, offset), trailer], { type: 'image/gif' })
+      left,
+      top,
+      image: new Blob([frameHeader, descriptor, bytes.subarray(dataStart, offset), trailer], { type: 'image/gif' })
     });
     duration = 100;
   }
@@ -90,9 +106,25 @@ export async function playIntroGif(canvas, src, signal) {
   signal.throwIfAborted();
   const { width, height, frames } = readFrames(new Uint8Array(bytes));
   signal.throwIfAborted();
-  canvas.width = width;
-  canvas.height = height;
+  const source = document.createElement('canvas');
+  source.width = width;
+  source.height = height;
+  const composite = source.getContext('2d', { alpha: false });
   const context = canvas.getContext('2d', { alpha: false });
+
+  function paintFrame(frame, image) {
+    composite.drawImage(image, frame.left, frame.top);
+    const scale = Math.min(canvas.clientWidth / width, canvas.clientHeight / height) * window.devicePixelRatio;
+    const displayWidth = Math.max(1, Math.round(width * scale));
+    const displayHeight = Math.max(1, Math.round(height * scale));
+    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+      canvas.width = displayWidth;
+      canvas.height = displayHeight;
+    }
+    // Resample once at the actual display resolution, including Retina screens.
+    context.imageSmoothingQuality = 'high';
+    context.drawImage(source, 0, 0, displayWidth, displayHeight);
+  }
   const pending = new Map();
   let deadline = 0;
 
@@ -114,7 +146,7 @@ export async function playIntroGif(canvas, src, signal) {
     let now = await nextPaint();
     while (now < deadline) now = await nextPaint();
     signal.throwIfAborted();
-    context.drawImage(image, 0, 0);
+    paintFrame(frame, image);
     canvas.dataset.introFrame = String(index + 1);
     // Keep normal refresh-rate rounding from accumulating. If decoding is
     // late, let the timeline slip so no frame is skipped to catch up.
