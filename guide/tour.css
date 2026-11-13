@@ -317,3 +317,31 @@ body.tour-pointer-active:not(.tour-native-pointer-visible) #root:not(.tour-virtu
 body.tour-pointer-active:not(.tour-native-pointer-visible) #root:not(.tour-virtual-hit-test) *,
 body.tour-session-changing #root,
 body.tour-session-changing #root * { pointer-events:none !important; }
+
+/* Carry the rendered previous view through reset; never expose a blank root. */
+.tour-session-snapshot { background:transparent; isolation:isolate; }
+.tour-session-snapshot, .tour-session-snapshot * {
+  pointer-events:none!important;
+  animation:none!important;
+  transition:none!important;
+  caret-color:transparent!important;
+}
+
+.tour-replay-flight::before {
+  content:var(--tour-flight-icon,"↻");
+  font-size:inherit;
+  line-height:1;
+}
+body.tour-awaiting-personal-file .app-usage-workspace .tk-list,
+body.tour-awaiting-trace-file [data-testid="how-source"] .tk-list { display:none; }
+
+/* Guide source notices must not disappear above an anchored record list. */
+body.tour-dock-active .app-usage-workspace:has([data-testid="usage-mode-tracker"].is-selected) > [data-testid="usage-source"] { display:none !important; }
+
+/* Keep supporting trace-import details out of the demonstration only. */
+body.tour-dock-active [data-testid="how-source"] .tk-field:has([data-testid="how-frame"]),
+body.tour-dock-active [data-testid="how-source"] [data-testid="how-note"],
+body.tour-dock-active [data-testid="how-source"] [data-testid="how-limits"] { display:none !important; }
+
+/* Keep the demonstration pointer above frozen chapter/session frames. */
+#punch-tour-cursor { z-index:2147483000; }
