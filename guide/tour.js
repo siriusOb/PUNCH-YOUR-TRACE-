@@ -1,6 +1,6 @@
 const stylesheet = document.createElement('link')
 stylesheet.rel = 'stylesheet'
-stylesheet.href = new URL('tour.css?view=guide-motion-v121', import.meta.url)
+stylesheet.href = new URL('tour.css', import.meta.url)
 document.head.append(stylesheet)
 
 const root = document.querySelector('#root')
@@ -29,7 +29,7 @@ const nextIcon = icon('<path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" 
 
 const panel = document.createElement('aside')
 panel.id = 'punch-tour'
-panel.setAttribute('aria-label', 'PUNCH YOUR TRACE walkthrough')
+panel.setAttribute('aria-label', 'DOTCOM walkthrough')
 panel.innerHTML = `
   <div class="tour-line">
     <div class="tour-text">
@@ -68,7 +68,7 @@ dismiss.type = 'button'
 dismiss.textContent = 'Skip'
 const launchLabel = document.createElement('span')
 launchLabel.className = 'tour-launch-label'
-launchLabel.textContent = 'PUNCH YOUR TRACE / 01—03'
+launchLabel.textContent = 'DOTCOM / 01—03'
 launch.append(launchLabel, reopen, dismiss)
 panel.hidden = cursor.hidden = launch.hidden = exitGuide.hidden = true
 panel.append(exitGuide)
@@ -109,7 +109,7 @@ function clearHighlight() {
 function caption(title, body, phase = '시연 중') {
   panel.dataset.phase = phase
   chapterNumber.textContent = String(chapter + 1).padStart(2, '0') + ' / ' + String(titles.length).padStart(2, '0')
-  panel.setAttribute('aria-label', 'PUNCH YOUR TRACE walkthrough, chapter ' + (chapter + 1) + ' of ' + titles.length)
+  panel.setAttribute('aria-label', 'DOTCOM walkthrough, chapter ' + (chapter + 1) + ' of ' + titles.length)
   heading.textContent = titles[chapter]
   actionLabel.textContent = title
   for (const item of chapterMenu.querySelectorAll('[data-jump]')) {

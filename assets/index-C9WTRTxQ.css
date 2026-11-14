@@ -1229,3 +1229,11 @@
  .browser-page--trace26 .team-profile-primary {grid-template-columns:60px minmax(0,1fr);gap:10px;}
  .browser-page--trace26 .team-profile-primary-graphic {width:60px;height:60px;}
 }
+
+/* Local preview: preserve the heading/card gap in the detached export board too. */
+.our-export-comparison .p26-shared-overlays > .p26-section-head {
+  margin-bottom:18px;
+}
+.our-export-comparison .p26-shared-overlays > .p26-trace-overlay-grid {
+  margin-top:0;
+}
